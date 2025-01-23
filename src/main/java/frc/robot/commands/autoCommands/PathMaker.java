@@ -5,7 +5,6 @@
 package frc.robot.commands.autoCommands;
 
 import java.util.List;
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -58,8 +57,6 @@ public class PathMaker {
                 //final pose of the robot
                 m_finalPose,
                 m_config);
-        Logger.recordOutput("Pose", m_drive.getPose());
-        Logger.recordOutput("Traj", robotTrajectory);
 
         ProfiledPIDController thetaController =
             new ProfiledPIDController(

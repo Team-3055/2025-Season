@@ -8,7 +8,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import org.littletonrobotics.junction.LoggedRobot;
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -53,7 +53,7 @@ public final class Constants {
     public static final boolean kRearRightDriveEncoderReversed = true;
 
     // If you call DriveSubsystem.drive() with a different period make sure to update this.
-    public static final double kDrivePeriod = LoggedRobot.defaultPeriodSecs;
+    public static final double kDrivePeriod = 0.02;// LoggedRobot.defaultPeriodSecs;
 
     public static final double kTrackWidth = 0.66;
     // Distance between centers of right and left wheels on robot
@@ -88,6 +88,8 @@ public final class Constants {
     public static final double kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+    public static final double kDriveEncoderDistancePerRotation = 
+      kWheelDiameterMeters * 2 * Math.PI;
 
     public static final double kTurningEncoderDistancePerPulse =
         // Assumes the encoders are on a 1:1 reduction with the module shaft.

@@ -4,10 +4,7 @@
 
 package frc.robot;
 
-//import edu.wpi.first.wpilibj.TimedRobot;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
+import edu.wpi.first.wpilibj.TimedRobot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends LoggedRobot {
+public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private Command m_testCommand;
 
@@ -31,15 +28,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
 
-    Logger.recordMetadata("3055Robot", "Logger");
-
-    if(isReal()){
-      Logger.addDataReceiver(new NT4Publisher());
-    } else{
-      setUseTiming(true);
-      Logger.addDataReceiver(new NT4Publisher());
-    }
-    Logger.start();
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.

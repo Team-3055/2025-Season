@@ -4,8 +4,9 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -13,19 +14,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Encoder;
-import frc.robot.Robot;
+
 import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
-  private final PWMTalonFX m_driveMotor;
-  private final PWMTalonFX m_turningMotor;
-
-  private final Encoder m_driveEncoder;
-  private final Encoder m_turningEncoder;
-
-  private final EncoderSim m_driveEncoderSim;
-  private final EncoderSim m_turningEncoderSim;
+  private final TalonFX m_driveMotor;
+  private final TalonFX m_turningMotor;
+  private final CANcoder m_turningEncoderNew;
+  
+  private final int turningEncoderReversed;
+  private final int driveEncoderReversed;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -44,8 +42,7 @@ public class SwerveModule {
    * Constructs a SwerveModule.
    *
    * @param driveMotorChannel The channel of the drive motor.
-   * @param turningMotorChannel The 
-   * channel of the turning motor.
+   * @param turningMotorChannel The channel of the turning motor.
    * @param driveEncoderChannels The channels of the drive encoder.
    * @param turningEncoderChannels The channels of the turning encoder.
    * @param driveEncoderReversed Whether the drive encoder is reversed.
@@ -54,34 +51,15 @@ public class SwerveModule {
   public SwerveModule(
       int driveMotorChannel,
       int turningMotorChannel,
-      int[] driveEncoderChannels,
-      int[] turningEncoderChannels,
-      boolean driveEncoderReversed,
-      boolean turningEncoderReversed) {
-    m_driveMotor = new PWMTalonFX(driveMotorChannel);
-    m_turningMotor = new PWMTalonFX(turningMotorChannel);
-
-    m_driveEncoder = new Encoder(driveEncoderChannels[0], driveEncoderChannels[1]);
-    m_turningEncoder = new Encoder(turningEncoderChannels[0], turningEncoderChannels[1]);
+      int turningEncoderChannels,
+      Boolean driveEncoderReversedBool,
+      Boolean turningEncoderReversedBool) {
+    m_driveMotor = new TalonFX(driveMotorChannel);
+    m_turningMotor = new TalonFX(turningMotorChannel);
+    m_turningEncoderNew = new CANcoder(0);
     
-    m_driveEncoderSim = new EncoderSim(m_driveEncoder);
-    m_turningEncoderSim = new EncoderSim(m_turningEncoder);
-    
-    // Set the distance per pulse for the drive encoder. We can simply use the
-    // distance traveled for one rotation of the wheel divided by the encoder
-    // resolution.
-    m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
-
-    // Set whether drive encoder should be reversed or not
-    m_driveEncoder.setReverseDirection(driveEncoderReversed);
-
-    // Set the distance (in this case, angle) in radians per pulse for the turning encoder.
-    // This is the the angle through an entire rotation (2 * pi) divided by the
-    // encoder resolution.
-    m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
-
-    // Set whether turning encoder should be reversed or not
-    m_turningEncoder.setReverseDirection(turningEncoderReversed);
+    turningEncoderReversed = (turningEncoderReversedBool == true) ? -1 : 1;
+    driveEncoderReversed = (driveEncoderReversedBool == true) ? -1 : 1;
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
@@ -95,7 +73,8 @@ public class SwerveModule {
    */
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
+        //m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
+        (driveEncoderReversed * m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
   }
 
   /**
@@ -105,25 +84,29 @@ public class SwerveModule {
    */
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
-        m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
+        //m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
+        (m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
   }
 
 
   //used for updating the simulated encoder of the robot
-  public void updateSimEncoders(SwerveModuleState newState){
+  /*public void updateSimEncoders(SwerveModuleState newState){
+
     m_turningEncoderSim.setDistance(newState.angle.getRadians());
     m_driveEncoderSim.setRate(newState.speedMetersPerSecond);
     m_driveEncoderSim.setDistance(m_driveEncoderSim.getDistance() + (newState.speedMetersPerSecond * 0.02));
-  }
+  }*/
 
   public double getTurnAngle(){
-    return m_turningEncoder.getDistance();
+    //return m_turningEncoder.getDistance();
+    return m_turningEncoderNew.getPosition().getValueAsDouble();
   }
   public double getSpeed(){
-    return m_driveEncoder.getRate();
+    return m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation;
   }
   public double getModuleDistance(){
-    return m_driveEncoder.getDistance();
+    //return m_driveEncoder.getDistance();
+    return m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation;
   }
   /**
    * Sets the desired state for the module.
@@ -131,12 +114,10 @@ public class SwerveModule {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
-    var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
+    var encoderRotation = new Rotation2d(m_turningEncoderNew.getPosition().getValue());
     
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
-    
-  
     
     // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
     // direction of travel that can occur when modules change directions. This results in smoother
@@ -144,17 +125,17 @@ public class SwerveModule {
     state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
 
     //update the simulated encoders and gyros
-    if(Robot.isReal()){
+    /*if(Robot.isReal()){
       updateSimEncoders(state);
-    }
+    }*/
     
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
+        m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, state.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
-        m_turningPIDController.calculate(m_turningEncoder.getDistance(), state.angle.getRadians());
+        m_turningPIDController.calculate(m_turningEncoderNew.getPosition().getValueAsDouble(), state.angle.getRadians());
 
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.set(driveOutput);
@@ -164,7 +145,7 @@ public class SwerveModule {
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
-    m_driveEncoder.reset();
-    m_turningEncoder.reset();
+    m_driveMotor.setPosition(0);
+    m_turningEncoderNew.setPosition(0);
   }
 }
