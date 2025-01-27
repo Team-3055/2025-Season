@@ -55,7 +55,7 @@ public class RobotContainer {
                     Math.abs(m_driverController.getLeftX()) + Math.abs(m_driverController.getLeftY()) > 0.25 ? - m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     ((m_driverController.getRawAxis(5) * 0.5) - (m_driverController.getRawAxis(4) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
                     //m_driverController.getRawAxis(2) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-                    true),
+                    false),
             m_robotDrive));
   }
 

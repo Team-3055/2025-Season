@@ -45,7 +45,6 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
           DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
           DriveConstants.kFrontLeftTurningEncoderPorts,
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
@@ -54,7 +53,6 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kRearLeftDriveMotorPort,
           DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
           DriveConstants.kRearLeftTurningEncoderPorts,
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
@@ -63,7 +61,6 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kFrontRightDriveMotorPort,
           DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
           DriveConstants.kFrontRightTurningEncoderPorts,
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
@@ -72,7 +69,6 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModule(
           DriveConstants.kRearRightDriveMotorPort,
           DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
           DriveConstants.kRearRightTurningEncoderPorts,
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
@@ -159,14 +155,16 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     swerveModuleStates =
-        DriveConstants.kDriveKinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeed, ySpeed, rot));
+            /*ChassisSpeeds.discretize(
                 fieldRelative
                     ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                     : new ChassisSpeeds(xSpeed, ySpeed, rot),
                 DriveConstants.kDrivePeriod));
-    
+*/
+    //System.out.println("\n" + swerveModuleStates[0] + "\n" + swerveModuleStates[1] + "\n" + swerveModuleStates[2] + "\n" + swerveModuleStates[3]);
+
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     
@@ -175,6 +173,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    System.out.println(swerveModuleStates[2]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);

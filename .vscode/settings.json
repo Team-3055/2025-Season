@@ -56,5 +56,9 @@
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
-  ]
+  ],
+  "workbench.colorCustomizations": {
+    "minimap.background": "#00000000",
+    "scrollbar.shadow": "#00000000"
+  }
 }

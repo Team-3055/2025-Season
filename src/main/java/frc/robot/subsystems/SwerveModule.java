@@ -26,7 +26,7 @@ public class SwerveModule {
   private final int driveEncoderReversed;
 
   private final PIDController m_drivePIDController =
-      new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
+      new PIDController(ModuleConstants.kPModuleDriveController, 0.5, 0.5);
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController =
@@ -56,7 +56,7 @@ public class SwerveModule {
       Boolean turningEncoderReversedBool) {
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
-    m_turningEncoderNew = new CANcoder(0);
+    m_turningEncoderNew = new CANcoder(turningEncoderChannels);
     
     turningEncoderReversed = (turningEncoderReversedBool == true) ? -1 : 1;
     driveEncoderReversed = (driveEncoderReversedBool == true) ? -1 : 1;
@@ -115,14 +115,16 @@ public class SwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState) {
     var encoderRotation = new Rotation2d(m_turningEncoderNew.getPosition().getValue());
-    
+    desiredState.speedMetersPerSecond *= driveEncoderReversed;
     // Optimize the reference state to avoid spinning further than 90 degrees
-    SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
+    desiredState.optimize(encoderRotation);
     
     // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
     // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
-    state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
+    desiredState.cosineScale(encoderRotation);
+
+    
 
     //update the simulated encoders and gyros
     /*if(Robot.isReal()){
@@ -131,15 +133,20 @@ public class SwerveModule {
     
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, state.speedMetersPerSecond);
+        m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
 
+    double pos = m_turningEncoderNew.getPosition().getValueAsDouble();
     // Calculate the turning motor output from the turning PID controller.
-    final double turnOutput =
-        m_turningPIDController.calculate(m_turningEncoderNew.getPosition().getValueAsDouble(), state.angle.getRadians());
-
+    final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
+      m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
+    if (m_turningMotor.isConnected()) {
+      System.out.println(pos/* - (pos < 0 ? Math.ceil(pos):Math.floor(pos)))*/*2*Math.PI);
+    }
+    
     // Calculate the turning motor output from the turning PID controller.
-    m_driveMotor.set(driveOutput);
-    m_turningMotor.set(turnOutput);
+    
+    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond);//driveOutput);
+    m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }
 
