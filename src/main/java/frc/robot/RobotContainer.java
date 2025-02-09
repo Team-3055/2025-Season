@@ -55,7 +55,7 @@ public class RobotContainer {
                     Math.abs(m_driverController.getLeftX()) + Math.abs(m_driverController.getLeftY()) > 0.25 ? - m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     ((m_driverController.getRawAxis(5) * 0.5) - (m_driverController.getRawAxis(4) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
                     //m_driverController.getRawAxis(2) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-                    false),
+                    true),
             m_robotDrive));
   }
 
@@ -73,17 +73,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    
     return pathMaker.createPath(
       m_robotDrive,
-      new Pose2d(3, 3, new Rotation2d(0)),
-      List.of(new Translation2d(3,0)),
+      new Pose2d(0.5, 0, new Rotation2d(0)),
+      List.of(),//new Translation2d(3,0)),
       false
-    ).andThen(pathMaker.createPath(
+    );/*.andThen(pathMaker.createPath(
       m_robotDrive,
       new Pose2d(-3,-3, new Rotation2d(0)),
       List.of(new Translation2d(-3,0)),
       false));
-      
+      */
   }
 
   public Command getTestCommand(int testNumber){

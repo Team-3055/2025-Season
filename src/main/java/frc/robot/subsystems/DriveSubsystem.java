@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
@@ -33,6 +34,8 @@ public class DriveSubsystem extends SubsystemBase {
     .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
     .getStructTopic("MyPose", Pose2d.struct).publish();
+  StructPublisher<SwerveModulePosition> SwerveModLocation = NetworkTableInstance.getDefault()
+    .getStructTopic("SwerveModLocation", SwerveModulePosition.struct).publish();
 
   DoublePublisher anglePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Angles").publish();
   DoublePublisher speedPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Speed").publish();
@@ -106,7 +109,8 @@ public class DriveSubsystem extends SubsystemBase {
       publisher.set(swerveModuleStates);
 
       //update the simulated sensors to data that was sent to the motors.
-      m_odometry.update(
+    }
+    m_odometry.update(
         m_gyro.getRotation2d(),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
@@ -116,7 +120,7 @@ public class DriveSubsystem extends SubsystemBase {
         });
       //send the robot pose via network tables so sim-data can be viewed
       posePublisher.set(m_odometry.getPoseMeters());
-    }
+      SwerveModLocation.set(m_frontLeft.getPosition());
   }
 
   /**
@@ -125,6 +129,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
+    
     return m_odometry.getPoseMeters();
   }
 
@@ -155,14 +160,14 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     swerveModuleStates =
-        DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeed, ySpeed, rot));
-            /*ChassisSpeeds.discretize(
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(//new ChassisSpeeds(xSpeed, ySpeed, rot));
+            ChassisSpeeds.discretize(
                 fieldRelative
                     ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                     : new ChassisSpeeds(xSpeed, ySpeed, rot),
                 DriveConstants.kDrivePeriod));
-*/
+
     //System.out.println("\n" + swerveModuleStates[0] + "\n" + swerveModuleStates[1] + "\n" + swerveModuleStates[2] + "\n" + swerveModuleStates[3]);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -173,7 +178,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    System.out.println(swerveModuleStates[2]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);

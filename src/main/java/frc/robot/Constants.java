@@ -50,9 +50,9 @@ public final class Constants {
     // If you call DriveSubsystem.drive() with a different period make sure to update this.
     public static final double kDrivePeriod = 0.02;// LoggedRobot.defaultPeriodSecs;
 
-    public static final double kTrackWidth = 0.66;
+    public static final double kTrackWidth = 0.63;
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.76;
+    public static final double kWheelBase = 0.58;
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
@@ -68,18 +68,20 @@ public final class Constants {
     // for *your* robot's drive.
     // The SysId tool provides a convenient method for obtaining these values for your robot.
     public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = 0.8;
+    public static final double kvVoltSecondsPerMeter = 0.12;
     public static final double kaVoltSecondsSquaredPerMeter = 0.15;
+    public static final double kVoltsPerRotation = 60/523;
+    public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 2;
+    public static final double kMaxSpeedMetersPerSecond = 1;
   }
 
   public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4 * Math.PI;
+    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 10 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4 * Math.PI;
 
     public static final int kEncoderCPR = 4096;
-    public static final double kWheelDiameterMeters = 0.10;
+    public static final double kWheelDiameterMeters = 0.102;
     public static final double kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
@@ -97,10 +99,11 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int ladderMotorPort = 1;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxSpeedMetersPerSecond = 0.1;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;

@@ -5,7 +5,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -16,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.DriveConstants;
 
 public class SwerveModule {
   private final TalonFX m_driveMotor;
@@ -25,6 +29,8 @@ public class SwerveModule {
   private final int turningEncoderReversed;
   private final int driveEncoderReversed;
 
+
+
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0.5, 0.5);
 
@@ -32,8 +38,8 @@ public class SwerveModule {
   private final ProfiledPIDController m_turningPIDController =
       new ProfiledPIDController(
           ModuleConstants.kPModuleTurningController,
-          0,
-          0,
+          0.2,
+          0.2,
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
@@ -70,7 +76,19 @@ public class SwerveModule {
    * Returns the current state of the module.
    *
    * @return The current state of the module.
+   * 
    */
+  public void setMotionMagicConfigs(){
+    var talonFXConfigs = new TalonFXConfiguration();
+    var slotConfigs = talonFXConfigs.Slot0;
+    slotConfigs.kS = 0.25;
+    slotConfigs.kV = 0.12;
+
+    var motionMagicConfigs = talonFXConfigs.MotionMagic;
+    //motionMagicConfigs.
+  }
+
+
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         //m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
@@ -83,6 +101,7 @@ public class SwerveModule {
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
+    System.out.println(m_driveMotor.getPosition().getValue());
     return new SwerveModulePosition(
         //m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
         (m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
@@ -139,13 +158,12 @@ public class SwerveModule {
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
       m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
-    if (m_turningMotor.isConnected()) {
-      System.out.println(pos/* - (pos < 0 ? Math.ceil(pos):Math.floor(pos)))*/*2*Math.PI);
-    }
     
+    //final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
+    //m_driveMotor.setControl(m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation));
     // Calculate the turning motor output from the turning PID controller.
-    
-    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond);//driveOutput);
+    //System.out.println(desiredState.speedMetersPerSecond);
+    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond / DriveConstants.kvVoltSecondsPerMeter);//driveOutput);
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }
