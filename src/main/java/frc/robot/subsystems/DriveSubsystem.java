@@ -17,7 +17,6 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;

@@ -38,8 +38,8 @@ public class SwerveModule {
   private final ProfiledPIDController m_turningPIDController =
       new ProfiledPIDController(
           ModuleConstants.kPModuleTurningController,
-          0.2,
-          0.2,
+          1,
+          1,
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
@@ -159,11 +159,11 @@ public class SwerveModule {
     final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
       m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
     
-    //final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
+    final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
     //m_driveMotor.setControl(m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation));
     // Calculate the turning motor output from the turning PID controller.
     //System.out.println(desiredState.speedMetersPerSecond);
-    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond / DriveConstants.kvVoltSecondsPerMeter);//driveOutput);
+    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond);// / DriveConstants.kvVoltSecondsPerMeter);//driveOutput);
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }

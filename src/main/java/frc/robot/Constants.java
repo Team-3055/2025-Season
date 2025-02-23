@@ -99,7 +99,9 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int ladderMotorPort = 1;
+    public static final int ladderMotorPort1 = 1;
+    public static final int ladderMotorPort2 = 2;
+    public static final double ladderMotorSpeed = 1.00;
   }
 
   public static final class AutoConstants {
