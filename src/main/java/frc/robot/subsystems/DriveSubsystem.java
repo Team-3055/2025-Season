@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -23,6 +24,7 @@ import frc.robot.Constants.DriveConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
 public class DriveSubsystem extends SubsystemBase {
   // Robot swerve modules
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -33,14 +35,10 @@ public class DriveSubsystem extends SubsystemBase {
     .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
     StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
     .getStructTopic("MyPose", Pose2d.struct).publish();
-  StructPublisher<SwerveModulePosition> SwerveModLocation = NetworkTableInstance.getDefault()
-    .getStructTopic("SwerveModLocation", SwerveModulePosition.struct).publish();
 
   DoublePublisher anglePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Angles").publish();
   DoublePublisher speedPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Speed").publish();
   DoublePublisher distancePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Distance").publish();
-
-
 
 
   private final SwerveModule m_frontLeft =
@@ -75,21 +73,25 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
+  private final VisionSubsystem m_vision = new VisionSubsystem();
+
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
   private final ADXRS450_GyroSim m_GyroSim = new ADXRS450_GyroSim(m_gyro);
   
+  
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
-          DriveConstants.kDriveKinematics,
-          m_gyro.getRotation2d(),
-          new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-          });
+  SwerveDrivePoseEstimator m_odometry = 
+    new SwerveDrivePoseEstimator(
+      DriveConstants.kDriveKinematics,
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      },
+      new Pose2d());
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
@@ -104,22 +106,26 @@ public class DriveSubsystem extends SubsystemBase {
       anglePublisher.set(m_frontLeft.getTurnAngle());
       speedPublisher.set(m_frontLeft.getSpeed());
       distancePublisher.set(m_frontLeft.getModuleDistance());
-    
       publisher.set(swerveModuleStates);
 
-      //update the simulated sensors to data that was sent to the motors.
-    }
-    m_odometry.update(
-        m_gyro.getRotation2d(),
-        new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-        });
       //send the robot pose via network tables so sim-data can be viewed
-      posePublisher.set(m_odometry.getPoseMeters());
-      SwerveModLocation.set(m_frontLeft.getPosition());
+      posePublisher.set(m_odometry.getEstimatedPosition());
+    }
+    
+    //add vision position estimates to odometry calculations.
+    var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+    if(visionPoseEstimate != null){
+      m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
+    }
+    //update odometry with swerve module positions
+    m_odometry.update(       
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      });
   }
 
   /**
@@ -129,7 +135,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     
-    return m_odometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();
   }
 
   /**
@@ -159,16 +165,14 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     swerveModuleStates =
-        DriveConstants.kDriveKinematics.toSwerveModuleStates(//new ChassisSpeeds(xSpeed, ySpeed, rot));
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(
             ChassisSpeeds.discretize(
                 fieldRelative
                     ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                     : new ChassisSpeeds(xSpeed, ySpeed, rot),
                 DriveConstants.kDrivePeriod));
-
-    //System.out.println("\n" + swerveModuleStates[0] + "\n" + swerveModuleStates[1] + "\n" + swerveModuleStates[2] + "\n" + swerveModuleStates[3]);
-
+    
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     
