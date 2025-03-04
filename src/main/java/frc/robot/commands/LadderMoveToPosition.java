@@ -19,7 +19,7 @@ public class LadderMoveToPosition extends Command {
    * @param subsystem The subsystem used by this command.
    */
   
-  public LadderMoveToPosition(LadderSubsystem subsystem, double height) {
+  public LadderMoveToPosition(LadderSubsystem subsystem) {
     m_ladder = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);

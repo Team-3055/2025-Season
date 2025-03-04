@@ -92,12 +92,17 @@ public class RobotContainer {
 
   public Command getTestCommand(int testNumber){
     switch(testNumber){
-      case 1:
-        return new ZeroModules(m_robotDrive);
-      case 2:
-        return new MoveForward(m_robotDrive);
+      case 1: 
+        return pathMaker.createPath(
+          m_robotDrive,
+          new Pose2d(0, 4, new Rotation2d(0)),
+          List.of(),//new Translation2d(3,0)),
+          false);
       default:
-        return new Command(){}; 
+        return new Command() {
+          
+        };
+        
     }
   }
 }

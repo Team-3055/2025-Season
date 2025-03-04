@@ -22,28 +22,28 @@ public final class Constants {
 
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 3;
-    public static final int kRearLeftDriveMotorPort = 2;
-    public static final int kFrontRightDriveMotorPort = 1;
-    public static final int kRearRightDriveMotorPort = 7;
+    public static final int kFrontLeftDriveMotorPort = 1;
+    public static final int kRearLeftDriveMotorPort = 7;
+    public static final int kFrontRightDriveMotorPort = 3;
+    public static final int kRearRightDriveMotorPort = 5;
 
-    public static final int kFrontLeftTurningMotorPort = 8;
-    public static final int kRearLeftTurningMotorPort = 4;
-    public static final int kFrontRightTurningMotorPort = 5;
+    public static final int kFrontLeftTurningMotorPort = 2;
+    public static final int kRearLeftTurningMotorPort = 8;
+    public static final int kFrontRightTurningMotorPort = 4;
     public static final int kRearRightTurningMotorPort = 6;
 
-    public static final int kFrontLeftTurningEncoderPorts = 3;
-    public static final int kRearLeftTurningEncoderPorts = 4;
-    public static final int kFrontRightTurningEncoderPorts = 1; 
-    public static final int kRearRightTurningEncoderPorts = 2;
-
+    public static final int kFrontLeftTurningEncoderPorts = 4;
+    public static final int kRearLeftTurningEncoderPorts = 2;
+    public static final int kFrontRightTurningEncoderPorts = 3; 
+    public static final int kRearRightTurningEncoderPorts = 1;
+    
     public static final boolean kFrontLeftTurningEncoderReversed = true;
     public static final boolean kRearLeftTurningEncoderReversed = true;
     public static final boolean kFrontRightTurningEncoderReversed = true;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-    public static final boolean kFrontLeftDriveEncoderReversed = true;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
+    public static final boolean kFrontLeftDriveEncoderReversed = false;
+    public static final boolean kRearLeftDriveEncoderReversed = false;
     public static final boolean kFrontRightDriveEncoderReversed = false;
     public static final boolean kRearRightDriveEncoderReversed =  false;
 
@@ -86,7 +86,7 @@ public final class Constants {
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
     public static final double kDriveEncoderDistancePerRotation = 
-      kWheelDiameterMeters * 2 * Math.PI;
+      kWheelDiameterMeters * Math.PI;
 
     public static final double kTurningEncoderDistancePerPulse =
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
@@ -94,7 +94,7 @@ public final class Constants {
 
     public static final double kPModuleTurningController = 1;
 
-    public static final double kPModuleDriveController = 1;
+    public static final double kPModuleDriveController = 0.25;
   }
 
   public static final class OIConstants {

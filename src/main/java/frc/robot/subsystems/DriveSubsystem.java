@@ -31,15 +31,10 @@ public class DriveSubsystem extends SubsystemBase {
   NetworkTable table = inst.getTable("datatable");
   SwerveModuleState[] swerveModuleStates;
   
-  StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault()
+  StructArrayPublisher<SwerveModuleState> modulePublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+  StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
     .getStructTopic("MyPose", Pose2d.struct).publish();
-
-  DoublePublisher anglePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Angles").publish();
-  DoublePublisher speedPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Speed").publish();
-  DoublePublisher distancePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Distance").publish();
-
 
   private final SwerveModule m_frontLeft =
       new SwerveModule(
@@ -77,8 +72,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
-  private final ADXRS450_GyroSim m_GyroSim = new ADXRS450_GyroSim(m_gyro);
-  
   
   // Odometry class for tracking robot pose
   SwerveDrivePoseEstimator m_odometry = 
@@ -98,25 +91,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   
   @Override
-  public void periodic() {
-    // Update the odometry in the periodic block
-    
-    //If robot is in simulation update published data every periodic call
-    if(Robot.isSimulation()){
-      anglePublisher.set(m_frontLeft.getTurnAngle());
-      speedPublisher.set(m_frontLeft.getSpeed());
-      distancePublisher.set(m_frontLeft.getModuleDistance());
-      publisher.set(swerveModuleStates);
-
-      //send the robot pose via network tables so sim-data can be viewed
-      posePublisher.set(m_odometry.getEstimatedPosition());
-    }
-    
+  public void periodic() {     
     //add vision position estimates to odometry calculations.
-    var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+    /*var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
     if(visionPoseEstimate != null){
       m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
-    }
+    }*/
+
     //update odometry with swerve module positions
     m_odometry.update(       
       m_gyro.getRotation2d(),
@@ -126,6 +107,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearLeft.getPosition(),
         m_rearRight.getPosition()
       });
+    posePublisher.set(m_odometry.getEstimatedPosition());
   }
 
   /**
@@ -175,10 +157,6 @@ public class DriveSubsystem extends SubsystemBase {
     
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    
-    if (Robot.isSimulation()) {
-      m_GyroSim.setAngle((m_gyro.getAngle() - (Math.toDegrees(rot) * 0.02)) * 1);//oduleConstants.kMaxModuleAngularSpeedRadiansPerSecond);
-    }
 
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
@@ -195,7 +173,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    publisher.set(desiredStates);
+    modulePublisher.set(desiredStates);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);

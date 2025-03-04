@@ -32,14 +32,14 @@ public class SwerveModule {
 
 
   private final PIDController m_drivePIDController =
-      new PIDController(ModuleConstants.kPModuleDriveController, 0.5, 0.5);
+      new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController =
       new ProfiledPIDController(
           ModuleConstants.kPModuleTurningController,
-          1,
-          1,
+          0,
+          0,
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
@@ -57,7 +57,7 @@ public class SwerveModule {
   public SwerveModule(
       int driveMotorChannel,
       int turningMotorChannel,
-      int turningEncoderChannels,
+        int turningEncoderChannels,
       Boolean driveEncoderReversedBool,
       Boolean turningEncoderReversedBool) {
     m_driveMotor = new TalonFX(driveMotorChannel);
@@ -90,6 +90,7 @@ public class SwerveModule {
 
 
   public SwerveModuleState getState() {
+  
     return new SwerveModuleState(
         //m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
         (driveEncoderReversed * m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
@@ -101,20 +102,11 @@ public class SwerveModule {
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
-    System.out.println(m_driveMotor.getPosition().getValue());
+    //System.out.println(m_driveMotor.getPosition().getValue());
     return new SwerveModulePosition(
         //m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
         (m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
   }
-
-
-  //used for updating the simulated encoder of the robot
-  /*public void updateSimEncoders(SwerveModuleState newState){
-
-    m_turningEncoderSim.setDistance(newState.angle.getRadians());
-    m_driveEncoderSim.setRate(newState.speedMetersPerSecond);
-    m_driveEncoderSim.setDistance(m_driveEncoderSim.getDistance() + (newState.speedMetersPerSecond * 0.02));
-  }*/
 
   public double getTurnAngle(){
     //return m_turningEncoder.getDistance();
@@ -142,28 +134,24 @@ public class SwerveModule {
     // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
     desiredState.cosineScale(encoderRotation);
-
-    
-
-    //update the simulated encoders and gyros
-    /*if(Robot.isReal()){
-      updateSimEncoders(state);
-    }*/
     
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
         m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
 
-    double pos = m_turningEncoderNew.getPosition().getValueAsDouble();
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
       m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
     
     final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
-    //m_driveMotor.setControl(m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation));
+    var request = m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation);
+    System.out.println(request.FeedForward);
+    //m_driveMotor.setControl(request);
+    
     // Calculate the turning motor output from the turning PID controller.
-    //System.out.println(desiredState.speedMetersPerSecond);
-    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond);// / DriveConstants.kvVoltSecondsPerMeter);//driveOutput);
+    System.out.println(driveOutput);
+  
+    m_driveMotor.setVoltage(desiredState.speedMetersPerSecond);
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }

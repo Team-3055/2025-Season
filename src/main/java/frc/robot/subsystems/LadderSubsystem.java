@@ -21,15 +21,20 @@ public class LadderSubsystem extends SubsystemBase {
   }
 
   public void moveToHeight(double position){
-    positionPID.calculate(m_encoder.getDistance(), position);
-    
+    double ladder_distance = positionPID.calculate(m_encoder.getDistance(), position);
+    double ladder_voltage = ladder_distance / m_encoder.getDistance();
+    if(ladder_voltage > 1){
+      ladder_voltage = 1;
+    } else if(ladder_voltage < -1){
+      ladder_voltage = -1;
+    }
+    ladderMotor1.set(ladder_voltage);
   }
   public void moveUp() {
     ladderMotor1.set(ladderMotorSpeed);
   }
 
   public void moveDown() {
-    
     ladderMotor1.set(-ladderMotorSpeed);
   }
 

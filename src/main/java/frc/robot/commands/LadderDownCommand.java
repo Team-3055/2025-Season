@@ -14,7 +14,7 @@ public class LadderDownCommand extends Command {
 
   @Override
   public void execute() {
-    //m_subsystem.moveDown();
+    m_subsystem.moveDown();
   }
 
   // Called when the command is initially scheduled.
