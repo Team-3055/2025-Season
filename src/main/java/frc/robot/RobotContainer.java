@@ -95,7 +95,7 @@ public class RobotContainer {
       case 1: 
         return pathMaker.createPath(
           m_robotDrive,
-          new Pose2d(0, 4, new Rotation2d(0)),
+          new Pose2d(4, 0, new Rotation2d(0)),
           List.of(),//new Translation2d(3,0)),
           false);
       default:

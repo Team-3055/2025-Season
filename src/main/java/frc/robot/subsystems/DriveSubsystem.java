@@ -74,8 +74,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
   
   // Odometry class for tracking robot pose
-  SwerveDrivePoseEstimator m_odometry = 
-    new SwerveDrivePoseEstimator(
+  SwerveDriveOdometry m_odometry = 
+    new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
       m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -87,7 +87,9 @@ public class DriveSubsystem extends SubsystemBase {
       new Pose2d());
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  public DriveSubsystem() {
+    m_gyro.calibrate();
+  }
 
   
   @Override
@@ -97,8 +99,10 @@ public class DriveSubsystem extends SubsystemBase {
     if(visionPoseEstimate != null){
       m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
     }*/
-
     //update odometry with swerve module positions
+    System.out.println(m_rearRight.swervePosition.distanceMeters);
+    System.out.println(m_rearRight.swervePosition.angle);
+    System.out.println("");
     m_odometry.update(       
       m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -107,7 +111,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearLeft.getPosition(),
         m_rearRight.getPosition()
       });
-    posePublisher.set(m_odometry.getEstimatedPosition());
+    posePublisher.set(m_odometry.getPoseMeters());
   }
 
   /**
@@ -116,8 +120,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    
-    return m_odometry.getEstimatedPosition();
+    return m_odometry.getPoseMeters();//.getEstimatedPosition();
   }
 
   /**
@@ -162,7 +165,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
-
+    
+    //System.out.println(m_rearRight.driveOutput);
   }
 
   /**

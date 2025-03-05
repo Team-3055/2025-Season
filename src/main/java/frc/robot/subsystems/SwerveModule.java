@@ -29,7 +29,9 @@ public class SwerveModule {
   private final int turningEncoderReversed;
   private final int driveEncoderReversed;
 
-
+  public SwerveModulePosition swervePosition;
+  public double driveOutput;
+  public double moduleDistance;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -93,7 +95,7 @@ public class SwerveModule {
   
     return new SwerveModuleState(
         //m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
-        (driveEncoderReversed * m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
+        (-driveEncoderReversed * m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValue()));//.getValueAsDouble() * 2 * Math.PI));
   }
 
   /**
@@ -102,10 +104,11 @@ public class SwerveModule {
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
-    //System.out.println(m_driveMotor.getPosition().getValue());
-    return new SwerveModulePosition(
+    swervePosition = new SwerveModulePosition(
         //m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
-        (m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
+        (-m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValue()));
+    
+    return swervePosition;
   }
 
   public double getTurnAngle(){
@@ -117,7 +120,8 @@ public class SwerveModule {
   }
   public double getModuleDistance(){
     //return m_driveEncoder.getDistance();
-    return m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation;
+    moduleDistance = m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation;
+    return moduleDistance;
   }
   /**
    * Sets the desired state for the module.
@@ -136,7 +140,7 @@ public class SwerveModule {
     desiredState.cosineScale(encoderRotation);
     
     // Calculate the drive output from the drive PID controller.
-    final double driveOutput =
+    driveOutput =
         m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
@@ -145,12 +149,13 @@ public class SwerveModule {
     
     final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
     var request = m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation);
-    System.out.println(request.FeedForward);
+    ///System.out.println(request.FeedForward);
     //m_driveMotor.setControl(request);
     
     // Calculate the turning motor output from the turning PID controller.
-    System.out.println(driveOutput);
+    
   
+
     m_driveMotor.setVoltage(desiredState.speedMetersPerSecond);
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
