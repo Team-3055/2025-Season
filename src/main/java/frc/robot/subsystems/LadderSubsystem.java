@@ -14,8 +14,9 @@ public class LadderSubsystem extends SubsystemBase {
   private double ladderMotorSpeed = OIConstants.ladderMotorSpeed;
   private Encoder m_encoder = new Encoder(0, 1);
   private ProfiledPIDController positionPID = new ProfiledPIDController(ladderMotorSpeed, ladderMotorSpeed, ladderMotorSpeed, null);
+  private double stallSpeed = 0.01;
 
-  public LadderSubsystem(LadderSubsystem subsystem){
+  public LadderSubsystem(){
     m_encoder.setDistancePerPulse(1);
     ladderMotor2.follow(ladderMotor1);
   }
@@ -30,16 +31,27 @@ public class LadderSubsystem extends SubsystemBase {
     }
     ladderMotor1.set(ladder_voltage);
   }
-  public void moveUp() {
-    ladderMotor1.set(ladderMotorSpeed);
+  public void moveUp(double voltage) {
+    ladderMotor1.setVoltage(voltage);
   }
 
   public void moveDown() {
     ladderMotor1.set(-ladderMotorSpeed);
   }
 
+  public void stall(){
+    ladderMotor1.set(stallSpeed);
+    ladderMotor1.set(-stallSpeed);
+  }
+
+  public void stop(){
+    ladderMotor1.stopMotor();
+
+  }
   @Override
+
   public void periodic() {
+    //System.out.println(m_encoder.getDistance());
     // This methofd will be called once per scheduler run
   }
 

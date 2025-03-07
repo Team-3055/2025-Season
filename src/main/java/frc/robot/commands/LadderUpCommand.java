@@ -14,7 +14,7 @@ public class LadderUpCommand extends Command {
 
   @Override
   public void execute() {
-    m_subsystem.moveUp();
+    m_subsystem.moveUp(5);
   }
 
   // Called when the command is initially scheduled.
@@ -23,7 +23,9 @@ public class LadderUpCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_subsystem.stop();
+  }
 
   // Returns true when the command should end.
   @Override

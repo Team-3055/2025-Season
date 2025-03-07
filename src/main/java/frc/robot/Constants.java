@@ -73,11 +73,11 @@ public final class Constants {
     public static final double kVoltsPerRotation = 60/523;
     public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxSpeedMetersPerSecond = 4;
   }
 
   public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 10 * Math.PI;
+    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4 * Math.PI;
 
     public static final int kEncoderCPR = 4096;
@@ -86,28 +86,28 @@ public final class Constants {
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
     public static final double kDriveEncoderDistancePerRotation = 
-      kWheelDiameterMeters * Math.PI;
+      (kWheelDiameterMeters * Math.PI)/6.75;
 
     public static final double kTurningEncoderDistancePerPulse =
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) kEncoderCPR;
 
-    public static final double kPModuleTurningController = 1;
+    public static final double kPModuleTurningController = 2;
 
-    public static final double kPModuleDriveController = 0.25;
+    public static final double kPModuleDriveController = 2;
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int ladderMotorPort1 = 1;
-    public static final int ladderMotorPort2 = 2;
+    public static final int ladderMotorPort1 = 10;
+    public static final int ladderMotorPort2 = 11;
     public static final double ladderMotorSpeed = 1.00;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 0.5;
+    public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 2* Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
     public static final double kPXController = 1;

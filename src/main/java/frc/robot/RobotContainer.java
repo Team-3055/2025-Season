@@ -6,12 +6,14 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-
+import frc.robot.subsystems.LadderSubsystem;
+import frc.robot.commands.LadderUpCommand;
 import frc.robot.commands.autoCommands.PathMaker;
 import frc.robot.commands.autoCommands.Tests.MoveForward;
 import frc.robot.commands.autoCommands.Tests.ZeroModules;
@@ -31,6 +33,7 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final LadderSubsystem m_ladder = new LadderSubsystem();
   private final PathMaker pathMaker = new PathMaker();
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -55,7 +58,7 @@ public class RobotContainer {
                     Math.abs(m_driverController.getLeftX()) + Math.abs(m_driverController.getLeftY()) > 0.25 ? - m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     ((m_driverController.getRawAxis(5) * 0.5) - (m_driverController.getRawAxis(4) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
                     //m_driverController.getRawAxis(2) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-                    false),
+                    true),
             m_robotDrive));
   }
 
@@ -95,13 +98,16 @@ public class RobotContainer {
       case 1: 
         return pathMaker.createPath(
           m_robotDrive,
-          new Pose2d(4, 0, new Rotation2d(0)),
-          List.of(),//new Translation2d(3,0)),
-          false);
+          new Pose2d(3, 0, new Rotation2d(0)),
+          List.of(),//new Translation2d(10,1)),
+          true);/* .andThen(pathMaker.createPath(
+          m_robotDrive, 
+          new Pose2d(0,2, new Rotation2d(0)),
+          List.of(),
+          true)
+        );*/
       default:
-        return new Command() {
-          
-        };
+        return new LadderUpCommand(m_ladder);
         
     }
   }
