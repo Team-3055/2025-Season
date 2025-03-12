@@ -48,7 +48,9 @@ public class LadderSubsystem extends SubsystemBase {
   }
  
   @Override
+
   public void periodic() {
-    // This methofd will be called once per scheduler run
+    //System.out.println(m_encoder.getDistance());
+    // This method will be called once per scheduler run
   }
 }

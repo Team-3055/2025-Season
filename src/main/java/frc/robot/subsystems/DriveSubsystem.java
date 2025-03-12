@@ -101,6 +101,9 @@ public class DriveSubsystem extends SubsystemBase {
       m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
     }
     //update odometry with swerve module positions
+    //System.out.println(m_rearRight.swervePosition.distanceMeters);
+    //System.out.println(m_rearRight.swervePosition.angle);
+    //System.out.println("");
     m_odometry.update(       
       m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -158,7 +161,7 @@ public class DriveSubsystem extends SubsystemBase {
     
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-
+    modulePublisher.set(swerveModuleStates);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);

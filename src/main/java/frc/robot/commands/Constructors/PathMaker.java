@@ -30,7 +30,7 @@ public class PathMaker {
     final DriveSubsystem m_drive = null;
     private Command commandSequence;
 
-    public TrajectoryConfig m_config =
+    private final TrajectoryConfig m_config =
         new TrajectoryConfig(
                 AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -70,15 +70,15 @@ public class PathMaker {
                 DriveConstants.kDriveKinematics,
 
                 // Position controllers
-                new PIDController(AutoConstants.kPXController, 0, 0),
-                new PIDController(AutoConstants.kPYController, 0, 0),
+                new PIDController(AutoConstants.kPXController, 1, 0.35),
+                new PIDController(AutoConstants.kPYController, 1, 0.35),
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
         commandSequence = Commands.sequence(
             //new InstantCommand(() -> m_drive.resetOdometry(robotTrajectory.getInitialPose())), 
-            swerveControllerCommand,
-            new InstantCommand(() -> m_drive.drive(0, 0, 0, false)));
+            swerveControllerCommand);
+            //new InstantCommand(() -> m_drive.drive(0, 0, 0, false)));
         return commandSequence;
     } 
 }
