@@ -13,13 +13,16 @@ import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LadderSubsystem;
+import frc.robot.commands.LadderDownCommand;
 import frc.robot.commands.LadderUpCommand;
+import frc.robot.commands.LadderStallCommand;
 import frc.robot.commands.autoCommands.PathMaker;
 import frc.robot.commands.autoCommands.Tests.MoveForward;
 import frc.robot.commands.autoCommands.Tests.ZeroModules;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.List;
 
@@ -36,7 +39,8 @@ public class RobotContainer {
   private final LadderSubsystem m_ladder = new LadderSubsystem();
   private final PathMaker pathMaker = new PathMaker();
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final Joystick m_driverRJoystick = new Joystick(OIConstants.kRightJoystickPort);
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -68,7 +72,19 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    
+  }
+
+  public void periodic() {
+    if(m_driverRJoystick.getY() > 0.1){
+      new LadderUpCommand(m_ladder);
+    } else if(m_driverRJoystick.getY() < -0.1){
+      new LadderDownCommand(m_ladder);
+    } else {
+      new LadderStallCommand(m_ladder);
+    }
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -6,15 +6,15 @@ import frc.robot.Constants.OIConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.Encoder;
-
 public class LadderSubsystem extends SubsystemBase {
 
   private final WPI_TalonSRX ladderMotor1 = new WPI_TalonSRX(OIConstants.ladderMotorPort1);
   private final WPI_TalonSRX ladderMotor2 = new WPI_TalonSRX(OIConstants.ladderMotorPort2);
+  private final WPI_TalonSRX ladderShooter = new WPI_TalonSRX(OIConstants.ladderShooterPort);
   private double ladderMotorSpeed = OIConstants.ladderMotorSpeed;
   private Encoder m_encoder = new Encoder(0, 1);
   private ProfiledPIDController positionPID = new ProfiledPIDController(ladderMotorSpeed, ladderMotorSpeed, ladderMotorSpeed, null);
-  private double stallSpeed = 0.01;
+  private double stallSpeed = 0.000001;
 
   public LadderSubsystem(){
     m_encoder.setDistancePerPulse(1);
@@ -31,12 +31,13 @@ public class LadderSubsystem extends SubsystemBase {
     }
     ladderMotor1.set(ladder_voltage);
   }
+
   public void moveUp(double voltage) {
     ladderMotor1.setVoltage(voltage);
   }
 
-  public void moveDown() {
-    ladderMotor1.set(-ladderMotorSpeed);
+  public void moveDown(double voltage) {
+    ladderMotor1.set(-voltage);
   }
 
   public void stall(){
@@ -44,9 +45,22 @@ public class LadderSubsystem extends SubsystemBase {
     ladderMotor1.set(-stallSpeed);
   }
 
-  public void stop(){
-    ladderMotor1.stopMotor();
+  public void shoot(){
+    ladderShooter.set(1);
+  }
 
+  /*
+   * Stops the ladder motors
+   */
+  public void stopLadder(){
+    ladderMotor1.stopMotor();
+  }
+
+  /*
+   * Stops the ladder shooter
+   */
+  public void stopShooter(){
+    ladderShooter.stopMotor();
   }
   @Override
 

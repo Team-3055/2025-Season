@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class LadderDownCommand extends Command {
   private final LadderSubsystem m_subsystem;
+  private double ladder_voltage = 5.0;
 
   public LadderDownCommand(LadderSubsystem subsystem) {
     m_subsystem = subsystem;
@@ -14,7 +15,7 @@ public class LadderDownCommand extends Command {
 
   @Override
   public void execute() {
-    m_subsystem.moveDown();
+    m_subsystem.moveDown(ladder_voltage);
   }
 
   // Called when the command is initially scheduled.
@@ -23,7 +24,9 @@ public class LadderDownCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_subsystem.stopLadder();
+  }
 
   // Returns true when the command should end.
   @Override
