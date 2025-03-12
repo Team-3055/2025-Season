@@ -1,13 +1,12 @@
-package frc.robot.commands;
+package frc.robot.commands.Ladder;
 
 import frc.robot.subsystems.LadderSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class LadderDownCommand extends Command {
+public class LadderUpCommand extends Command {
   private final LadderSubsystem m_subsystem;
-  private double ladder_voltage = 5.0;
 
-  public LadderDownCommand(LadderSubsystem subsystem) {
+  public LadderUpCommand(LadderSubsystem subsystem) {
     m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -15,7 +14,7 @@ public class LadderDownCommand extends Command {
 
   @Override
   public void execute() {
-    m_subsystem.moveDown(ladder_voltage);
+    m_subsystem.moveUp();
   }
 
   // Called when the command is initially scheduled.
@@ -25,7 +24,7 @@ public class LadderDownCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.stopLadder();
+    m_subsystem.stop();
   }
 
   // Returns true when the command should end.

@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -30,11 +31,12 @@ public class SwerveModule {
   private final int driveEncoderReversed;
 
   public SwerveModulePosition swervePosition;
-  public double driveOutput;
   public double moduleDistance;
 
   private final PIDController m_drivePIDController =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
+  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
+
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController =
@@ -140,23 +142,22 @@ public class SwerveModule {
     desiredState.cosineScale(encoderRotation);
     
     // Calculate the drive output from the drive PID controller.
-    driveOutput =
-        m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
-
+    
+    final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
+    
+    final double driveFeedforward = m_driveFeedforward.calculate(desiredState.speedMetersPerSecond);
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
       m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
     
-    final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);
-    var request = m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation);
-    //System.out.println(driveOutput);
+   //final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);  
+    //var request = m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation);
+    ///System.out.println(request.FeedForward);
     //m_driveMotor.setControl(request);
     
     // Calculate the turning motor output from the turning PID controller.
-    
-  
-
-    m_driveMotor.setVoltage(driveOutput);//desiredState.speedMetersPerSecond);
+      
+    m_driveMotor.setVoltage(driveOutput + driveFeedforward);//desiredState.speedMetersPerSecond);
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }
