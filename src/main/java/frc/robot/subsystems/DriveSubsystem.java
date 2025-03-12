@@ -68,14 +68,15 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
+  
   private final VisionSubsystem m_vision = new VisionSubsystem();
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
   
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = 
-    new SwerveDriveOdometry(
+  SwerveDrivePoseEstimator m_odometry = 
+    new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -95,14 +96,11 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {     
     //add vision position estimates to odometry calculations.
-    /*var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+    var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
     if(visionPoseEstimate != null){
       m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
-    }*/
+    }
     //update odometry with swerve module positions
-    System.out.println(m_rearRight.swervePosition.distanceMeters);
-    System.out.println(m_rearRight.swervePosition.angle);
-    System.out.println("");
     m_odometry.update(       
       m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -111,7 +109,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearLeft.getPosition(),
         m_rearRight.getPosition()
       });
-    posePublisher.set(m_odometry.getPoseMeters());
+    posePublisher.set(m_odometry.getEstimatedPosition());
   }
 
   /**
@@ -120,7 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();//.getEstimatedPosition();
+    return m_odometry.getEstimatedPosition();//.getEstimatedPosition();
   }
 
   /**

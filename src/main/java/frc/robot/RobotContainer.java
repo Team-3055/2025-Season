@@ -11,8 +11,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-
-import frc.robot.commands.autoCommands.PathMaker;
+import frc.robot.commands.Constructors.PathMaker;
 import frc.robot.commands.autoCommands.Tests.MoveForward;
 import frc.robot.commands.autoCommands.Tests.ZeroModules;
 import edu.wpi.first.wpilibj2.command.Command;

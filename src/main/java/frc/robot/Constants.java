@@ -99,13 +99,18 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+
     public static final int ladderMotorPort1 = 1;
     public static final int ladderMotorPort2 = 2;
     public static final double ladderMotorSpeed = 1.00;
+
+    public static final int liftMotorPort = 0;
+    public static final boolean liftMotorReversed = false;
+   
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 0.5;
+    public static final double kMaxSpeedMetersPerSecond = 1;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;

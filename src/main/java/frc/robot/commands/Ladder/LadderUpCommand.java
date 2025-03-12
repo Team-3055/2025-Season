@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.Ladder;
 
 import frc.robot.subsystems.LadderSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,7 +14,7 @@ public class LadderUpCommand extends Command {
 
   @Override
   public void execute() {
-    m_subsystem.moveUp();
+    //m_subsystem.moveUp();
   }
 
   // Called when the command is initially scheduled.
