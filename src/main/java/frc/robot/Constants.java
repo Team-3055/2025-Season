@@ -22,15 +22,17 @@ public final class Constants {
 
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 1;
-    public static final int kRearLeftDriveMotorPort = 7;
-    public static final int kFrontRightDriveMotorPort = 3;
-    public static final int kRearRightDriveMotorPort = 5;
+    public static boolean enableDrive = true;
 
-    public static final int kFrontLeftTurningMotorPort = 2;
-    public static final int kRearLeftTurningMotorPort = 8;
-    public static final int kFrontRightTurningMotorPort = 4;
-    public static final int kRearRightTurningMotorPort = 6;
+    public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
+    public static final int kRearLeftDriveMotorPort = enableDrive ? 7 : 0;
+    public static final int kFrontRightDriveMotorPort = enableDrive ? 3 : 0;
+    public static final int kRearRightDriveMotorPort = enableDrive ? 5 : 0;
+
+    public static final int kFrontLeftTurningMotorPort = enableDrive ? 2 : 0;
+    public static final int kRearLeftTurningMotorPort = enableDrive ? 8 : 0;
+    public static final int kFrontRightTurningMotorPort = enableDrive ? 4 : 0;
+    public static final int kRearRightTurningMotorPort = enableDrive ? 6 : 0;
 
     public static final int kFrontLeftTurningEncoderPorts = 4;
     public static final int kRearLeftTurningEncoderPorts = 2;
@@ -42,10 +44,10 @@ public final class Constants {
     public static final boolean kFrontRightTurningEncoderReversed = true;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-    public static final boolean kFrontLeftDriveEncoderReversed = true;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = true;
-    public static final boolean kRearRightDriveEncoderReversed =  true;
+    public static final boolean kFrontLeftDriveEncoderReversed = false;
+    public static final boolean kRearLeftDriveEncoderReversed = false;
+    public static final boolean kFrontRightDriveEncoderReversed = false;
+    public static final boolean kRearRightDriveEncoderReversed =  false;
 
     // If you call DriveSubsystem.drive() with a different period make sure to update this.
     public static final double kDrivePeriod = 0.02;// LoggedRobot.defaultPeriodSecs;
@@ -73,7 +75,7 @@ public final class Constants {
     public static final double kVoltsPerRotation = 60/523;
     public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 4;
+    public static final double kMaxSpeedMetersPerSecond = 1;
   }
 
   public static final class ModuleConstants {
@@ -94,7 +96,7 @@ public final class Constants {
 
     public static final double kPModuleTurningController = 2;
 
-    public static final double kPModuleDriveController = 2;
+    public static final double kPModuleDriveController = 0.75;
   }
 
   public static final class OIConstants {
@@ -108,10 +110,13 @@ public final class Constants {
    
     public static final int kRightJoystickPort = 1;
     public static final int ladderShooterPort = 12;
+
+    public static final int intakeMotorPort = 20;
+    public static final double intakeSpeed = 0.1;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAutoSpeedMetersPerSecond = 0.25;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = 2* Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;

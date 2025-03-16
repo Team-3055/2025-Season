@@ -69,7 +69,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightTurningEncoderReversed);
 
   
-  private final VisionSubsystem m_vision = new VisionSubsystem();
+  //private final VisionSubsystem m_vision = new VisionSubsystem();
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
@@ -96,10 +96,10 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {     
     //add vision position estimates to odometry calculations.
-    var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+    /*var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
     if(visionPoseEstimate != null){
       m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
-    }
+    }*/
     //update odometry with swerve module positions
     //System.out.println(m_rearRight.swervePosition.distanceMeters);
     //System.out.println(m_rearRight.swervePosition.angle);

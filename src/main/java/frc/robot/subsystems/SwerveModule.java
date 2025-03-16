@@ -18,7 +18,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.DriveConstants;
 
@@ -32,18 +33,28 @@ public class SwerveModule {
 
   public SwerveModulePosition swervePosition;
   public double moduleDistance;
+  public CommandJoystick stick = new CommandJoystick(3);
 
-  private final PIDController m_drivePIDController =
-      new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
-  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
+  public int driveChannel;
+
+  private final ProfiledPIDController m_drivePIDController =
+      new ProfiledPIDController(
+        ModuleConstants.kPModuleDriveController,
+        0,
+        0,
+        new TrapezoidProfile.Constraints(
+          DriveConstants.kMaxSpeedMetersPerSecond,
+          2));
+
+  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
 
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController =
       new ProfiledPIDController(
           ModuleConstants.kPModuleTurningController,
-          1,
-          0.25,
+          0,
+          0,
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
@@ -64,6 +75,9 @@ public class SwerveModule {
         int turningEncoderChannels,
       Boolean driveEncoderReversedBool,
       Boolean turningEncoderReversedBool) {
+
+    driveChannel = driveMotorChannel;
+
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
     m_turningEncoderNew = new CANcoder(turningEncoderChannels);
@@ -82,16 +96,6 @@ public class SwerveModule {
    * @return The current state of the module.
    * 
    */
-  public void setMotionMagicConfigs(){
-    var talonFXConfigs = new TalonFXConfiguration();
-    var slotConfigs = talonFXConfigs.Slot0;
-    slotConfigs.kS = 0.25;
-    slotConfigs.kV = 0.12;
-
-    var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    //motionMagicConfigs.
-  }
-
 
   public SwerveModuleState getState() {
   
@@ -145,7 +149,7 @@ public class SwerveModule {
     
     final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
     
-    final double driveFeedforward = m_driveFeedforward.calculate(desiredState.speedMetersPerSecond);
+    final double driveFeedforward = m_driveFeedforward.calculate(driveOutput);//desiredState.speedMetersPerSecond);
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
       m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
@@ -156,8 +160,7 @@ public class SwerveModule {
     //m_driveMotor.setControl(request);
     
     // Calculate the turning motor output from the turning PID controller.
-      
-    m_driveMotor.setVoltage(driveOutput + driveFeedforward);//desiredState.speedMetersPerSecond);
+    m_driveMotor.setVoltage(/*(driveOutput + */driveFeedforward);//desiredState.speedMetersPerSecond);
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }

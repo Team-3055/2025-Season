@@ -6,10 +6,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import frc.robot.Constants.OIConstants;
 
 public class Intake extends SubsystemBase {
-  public TalonSRX intakeMotor = new TalonSRX(0);
+  public WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(OIConstants.intakeMotorPort);
+  private double motorSpeed = OIConstants.intakeSpeed;
   /** Creates a new ExampleSubsystem. */
   public Intake() {}
 
@@ -31,18 +33,13 @@ public class Intake extends SubsystemBase {
    *
    * @return value of some boolean subsystem state, such as a digital sensor.
    */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
+  public void intakeIn(){
+    m_intakeMotor.set(motorSpeed);
   }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void intakeOut(){
+    m_intakeMotor.set(-motorSpeed);
   }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
+  public void stop(){
+    m_intakeMotor.stopMotor();
   }
 }

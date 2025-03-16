@@ -13,10 +13,8 @@ import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LadderSubsystem;
-import frc.robot.commands.LadderDownCommand;
-import frc.robot.commands.LadderUpCommand;
-import frc.robot.commands.LadderStallCommand;
-import frc.robot.commands.autoCommands.PathMaker;
+import frc.robot.commands.Ladder.LadderMoveToPosition;
+import frc.robot.commands.Constructors.PathMaker;
 import frc.robot.commands.autoCommands.Tests.MoveForward;
 import frc.robot.commands.autoCommands.Tests.ZeroModules;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
 
 /*
@@ -37,6 +36,8 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final LadderSubsystem m_ladder = new LadderSubsystem();
+  //private DoubleSupplier ladderHeight = new DoubleSupplier();
+
   private final PathMaker pathMaker = new PathMaker();
   // The driver's controller
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -48,6 +49,11 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    /*m_ladder.setDefaultCommand(
+      new Command() {
+        
+      }//LadderMoveToPosition(m_ladder, 1.)
+    );*/ 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -62,7 +68,7 @@ public class RobotContainer {
                     Math.abs(m_driverController.getLeftX()) + Math.abs(m_driverController.getLeftY()) > 0.25 ? - m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     ((m_driverController.getRawAxis(5) * 0.5) - (m_driverController.getRawAxis(4) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
                     //m_driverController.getRawAxis(2) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-                    true),
+                    false),
             m_robotDrive));
   }
 
@@ -77,13 +83,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    if(m_driverRJoystick.getY() > 0.1){
-      new LadderUpCommand(m_ladder);
-    } else if(m_driverRJoystick.getY() < -0.1){
-      new LadderDownCommand(m_ladder);
-    } else {
-      new LadderStallCommand(m_ladder);
-    }
+
   }
 
   /**
@@ -122,8 +122,12 @@ public class RobotContainer {
           List.of(),
           true)
         );*/
+      case 2:
+        return new LadderMoveToPosition(m_ladder, 10000.).withTimeout(5);
       default:
-        return new LadderUpCommand(m_ladder);
+        return new Command() {
+          
+        };
         
     }
   }

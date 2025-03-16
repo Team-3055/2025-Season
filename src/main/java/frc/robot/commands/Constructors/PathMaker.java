@@ -32,7 +32,7 @@ public class PathMaker {
 
     private final TrajectoryConfig m_config =
         new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
+                AutoConstants.kMaxAutoSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared)
             // Add kinematics to ensure max speed is actually obeyed
             .setKinematics(DriveConstants.kDriveKinematics);
