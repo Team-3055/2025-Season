@@ -22,6 +22,9 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 import java.util.List;
 import java.util.function.DoubleSupplier;
@@ -35,6 +38,7 @@ import java.util.function.DoubleSupplier;
  */
 public class RobotContainer {
   // The robot's subsystems
+
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final LadderSubsystem m_ladder = new LadderSubsystem();
   public double ladderTargetHeight = 0;
@@ -44,15 +48,13 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final Joystick m_driverRJoystick = new Joystick(OIConstants.kRightJoystickPort);
   
+  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
-    m_ladder.setDefaultCommand(
-      new RunCommand(() -> m_ladder.moveToHeight(ladderTargetHeight))
-    );
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -78,9 +80,15 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverRJoystick,0).whileTrue(new Command() {
+    //
+    new JoystickButton(m_driverRJoystick,5).whileTrue(new LadderMoveToPosition(m_ladder, 9000)); //Top Left Button > Top Stick
+    new JoystickButton(m_driverRJoystick,3).whileTrue(new LadderMoveToPosition(m_ladder, 6000)); //Bottom Left > Middle Stick
+    new JoystickButton(m_driverRJoystick,6).whileTrue(new LadderMoveToPosition(m_ladder, 3000)); //Top Right > Bottom Stick
+    new JoystickButton(m_driverRJoystick,4).whileTrue(new LadderMoveToPosition(m_ladder, 1500)); //Bottom Right > Intake
+    new JoystickButton(m_driverRJoystick,2).whileTrue(new LadderMoveToPosition(m_ladder, 1000)); //Thumb Button > No Height
 
-    });
+
+
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     //new Trigger(m_driverController.getRawButton(0)).onTrue();
 
@@ -90,7 +98,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
-
+    //m_robotDrive.changeMaxSpeed(m_driverRJoystick.getRawAxis(0));    
   }
 
   /**
@@ -130,7 +138,7 @@ public class RobotContainer {
           true)
         );*/
       case 2:
-        return new LadderMoveToPosition(m_ladder, 10000.).withTimeout(5);
+        return new LadderMoveToPosition(m_ladder, 100000.).withTimeout(5).andThen(new LadderMoveToPosition(m_ladder, 0));
       default:
         return new Command() {
           

@@ -164,6 +164,11 @@ public class SwerveModule {
     m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
     
   }
+  public void changeMaxSpeed(double Speed){
+    m_drivePIDController.setConstraints(new TrapezoidProfile.Constraints(
+      Speed,
+      2));
+  }
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {

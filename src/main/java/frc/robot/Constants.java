@@ -23,6 +23,10 @@ public final class Constants {
 
   public static final class DriveConstants {
     public static boolean enableDrive = true;
+    public static boolean enableLadder = true;
+    public static boolean enableLift = true;
+    public static boolean enableIntake = true;
+    public static boolean enableBallHolder = true;
 
     public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
     public static final int kRearLeftDriveMotorPort = enableDrive ? 7 : 0;
@@ -94,15 +98,15 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) kEncoderCPR;
 
-    public static final double kPModuleTurningController = 2;
+    public static final double kPModuleTurningController = 3;
 
-    public static final double kPModuleDriveController = 0.75;
+    public static final double kPModuleDriveController = 0.9;
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int ladderMotorPort1 = 10;
-    public static final int ladderMotorPort2 = 11;
+    public static final int ladderMotorPort1 = DriveConstants.enableLadder == true ? 10 : 0;
+    public static final int ladderMotorPort2 = DriveConstants.enableLadder == true ? 11 : 0;
     public static final double ladderMotorSpeed = 1.00;
 
     public static final int liftMotorPort = 0;
