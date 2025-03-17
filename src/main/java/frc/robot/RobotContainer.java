@@ -20,6 +20,7 @@ import frc.robot.commands.autoCommands.Tests.ZeroModules;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.Joystick;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final LadderSubsystem m_ladder = new LadderSubsystem();
-  //private DoubleSupplier ladderHeight = new DoubleSupplier();
+  public double ladderTargetHeight = 0;
 
   private final PathMaker pathMaker = new PathMaker();
   // The driver's controller
@@ -49,11 +50,9 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    /*m_ladder.setDefaultCommand(
-      new Command() {
-        
-      }//LadderMoveToPosition(m_ladder, 1.)
-    );*/ 
+    m_ladder.setDefaultCommand(
+      new RunCommand(() -> m_ladder.moveToHeight(ladderTargetHeight))
+    );
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -79,7 +78,15 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    
+    new JoystickButton(m_driverRJoystick,0).whileTrue(new Command() {
+
+    });
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    //new Trigger(m_driverController.getRawButton(0)).onTrue();
+
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    //m_driverController.b(0).whileTrue();
   }
 
   public void periodic() {
