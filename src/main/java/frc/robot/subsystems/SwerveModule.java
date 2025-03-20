@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 
 public class SwerveModule {
@@ -44,7 +45,7 @@ public class SwerveModule {
         0,
         new TrapezoidProfile.Constraints(
           DriveConstants.kMaxSpeedMetersPerSecond,
-          2));
+          15));
 
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
 
@@ -112,7 +113,7 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     swervePosition = new SwerveModulePosition(
         //m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
-        (-m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValue()));
+        (m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValue()));
     
     return swervePosition;
   }
@@ -153,11 +154,6 @@ public class SwerveModule {
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
       m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
-    
-   //final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(0);  
-    //var request = m_request.withVelocity(desiredState.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerRotation);
-    ///System.out.println(request.FeedForward);
-    //m_driveMotor.setControl(request);
     
     // Calculate the turning motor output from the turning PID controller.
     m_driveMotor.setVoltage(/*(driveOutput + */driveFeedforward);//desiredState.speedMetersPerSecond);

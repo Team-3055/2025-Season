@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 
+
 public class LadderSubsystem extends SubsystemBase {
   public double m_targetPosition = 0;
 
@@ -32,8 +33,6 @@ public class LadderSubsystem extends SubsystemBase {
   private final WPI_TalonSRX m_ladderMotor2 = new WPI_TalonSRX(OIConstants.ladderMotorPort2);
   private final double m_encoderTickPerMeter = 1;
   private final double m_meterPerEncoderTick = 1/m_encoderTickPerMeter;
-
-  DoublePublisher ladderHeightPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Lift Height").publish();
 
 //12.75
   public LadderSubsystem(){
@@ -47,12 +46,12 @@ public class LadderSubsystem extends SubsystemBase {
     m_ladderMotor1.setInverted(true);
     m_ladderMotor1.configPeakOutputForward(1);
     m_ladderMotor2.configPeakOutputForward(1);
-    m_ladderMotor2.configPeakCurrentDuration(3000);
+    //m_ladderMotor2.configPeakCurrentDuration(3000);
 
-    m_ladderMotor1.config_kP(0, 0.05);
+    m_ladderMotor1.config_kP(0, 0.1);
     m_ladderMotor1.config_kI(0, 0);
-    m_ladderMotor1.config_kD(0, 0.05);
-    m_ladderMotor1.config_kF(0, 0);
+    m_ladderMotor1.config_kD(0, 0);
+    m_ladderMotor1.config_kF(0, 0.13);
  
     m_ladderMotor1.configAllowableClosedloopError(0, 100);
     m_ladderMotor2.follow(m_ladderMotor1);
@@ -62,14 +61,14 @@ public class LadderSubsystem extends SubsystemBase {
     m_targetPosition = position;
   }
   public double getHeight(){
-    return m_ladderMotor1.getSelectedSensorPosition() * m_meterPerEncoderTick;
+    return m_ladderMotor1.getSelectedSensorPosition();
   }
   public double getTargetHeight(){
     return m_targetPosition;
   }
   @Override
   public void periodic() {
-    m_ladderMotor1.set(ControlMode.Position, m_targetPosition * m_encoderTickPerMeter);
-    ladderHeightPublisher.set(m_ladderMotor1.getSelectedSensorPosition(), 0);
+    m_ladderMotor1.set(ControlMode.Position, m_targetPosition);
+    
   }
 }

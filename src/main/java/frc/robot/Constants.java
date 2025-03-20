@@ -22,11 +22,11 @@ public final class Constants {
 
 
   public static final class DriveConstants {
-    public static boolean enableDrive = true;
+    public static boolean enableDrive = false;
     public static boolean enableLadder = true;
-    public static boolean enableLift = true;
-    public static boolean enableIntake = true;
-    public static boolean enableBallHolder = true;
+    public static boolean enableLift = false;
+    public static boolean enableIntake = false;
+    public static boolean enableBallHolder = false;
 
     public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
     public static final int kRearLeftDriveMotorPort = enableDrive ? 7 : 0;
@@ -79,7 +79,7 @@ public final class Constants {
     public static final double kVoltsPerRotation = 60/523;
     public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxSpeedMetersPerSecond = 5;
   }
 
   public static final class ModuleConstants {
@@ -98,9 +98,10 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) kEncoderCPR;
 
+
     public static final double kPModuleTurningController = 3;
 
-    public static final double kPModuleDriveController = 0.9;
+    public static final double kPModuleDriveController = 0.6;
   }
 
   public static final class OIConstants {
@@ -109,14 +110,16 @@ public final class Constants {
     public static final int ladderMotorPort2 = DriveConstants.enableLadder == true ? 11 : 0;
     public static final double ladderMotorSpeed = 1.00;
 
-    public static final int liftMotorPort = 0;
+    public static final int ballHolder = DriveConstants.enableLadder == true ? 11 : 0;
+
+    public static final int liftMotorPort = DriveConstants.enableLift ? 12 : 0;
     public static final boolean liftMotorReversed = false;
    
     public static final int kRightJoystickPort = 1;
     public static final int ladderShooterPort = 12;
 
-    public static final int intakeMotorPort = 20;
-    public static final double intakeSpeed = 0.1;
+    public static final int intakeMotorPort = DriveConstants.enableIntake == true ? 14 : 0;
+    public static final double intakeSpeed = 0.25;
   }
 
   public static final class AutoConstants {

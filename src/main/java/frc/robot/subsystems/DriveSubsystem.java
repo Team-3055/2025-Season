@@ -24,7 +24,6 @@ import frc.robot.Constants.DriveConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 public class DriveSubsystem extends SubsystemBase {
   // Robot swerve modules
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -96,10 +95,11 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {     
     //add vision position estimates to odometry calculations.
-    /*var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
-    if(visionPoseEstimate != null){
-      m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
-    }*/
+    //var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+    //if(visionPoseEstimate != null && m_vision != null){
+    //  m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
+    //}
+
     //update odometry with swerve module positions
     //System.out.println(m_rearRight.swervePosition.distanceMeters);
     //System.out.println(m_rearRight.swervePosition.angle);
@@ -121,6 +121,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
+
     return m_odometry.getEstimatedPosition();//.getEstimatedPosition();
   }
 
