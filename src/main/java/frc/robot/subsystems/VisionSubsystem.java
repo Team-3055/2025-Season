@@ -32,17 +32,18 @@ public class VisionSubsystem extends SubsystemBase {
   static PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(tagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, frontCameraToRobot);
   static PhotonPipelineResult frontCameraResult;
   static PhotonPipelineResult backCameraResult;
+
   PhotonCamera frontCamera = new PhotonCamera("FrontCam");
   PhotonCamera backCamera = new PhotonCamera("BackCam");
 
   public VisionSubsystem(){
     poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
-    try{
-      PhotonCamera frontCamera = new PhotonCamera("FrontCam");
-      PhotonCamera backCamera = new PhotonCamera("BackCam");
+    /*try{
+      frontCamera = new PhotonCamera("FrontCam");
+      backCamera = new PhotonCamera("BackCam");
     } catch(ArithmeticException exception){
       cameraConnected = false;
-    }
+    }*/
   }
   public void updateCamera(){
     if(frontCamera.isConnected()){
@@ -55,15 +56,14 @@ public class VisionSubsystem extends SubsystemBase {
     }
   }
   public EstimatedRobotPose getEstimatedGlobalPose() {
-    var estimatedRobotPose = poseEstimator.update(frontCameraResult);
-    
-    if(estimatedRobotPose.isPresent()){
-      poseEstimator.setLastPose(estimatedRobotPose.get().estimatedPose);
-      return estimatedRobotPose.get();
+    if(frontCamera.isConnected()){
+      var estimatedRobotPose = poseEstimator.update(frontCameraResult);
+      if(estimatedRobotPose.isPresent()){
+        poseEstimator.setLastPose(estimatedRobotPose.get().estimatedPose);
+        return estimatedRobotPose.get();
+      }
     }
-    else{
-      return null;
-    }
+    return null;
   }
   public Pose2d getEstimatedLocalPose(){
     if(backCamera.isConnected()){

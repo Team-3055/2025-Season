@@ -19,6 +19,7 @@ import edu.wpi.first.networktables.StructPublisher;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 
@@ -67,8 +68,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
-  
-  //private final VisionSubsystem m_vision = new VisionSubsystem();
+  private final VisionSubsystem m_vision = Constants.DriveConstants.enableVision ? new VisionSubsystem() : null;
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
@@ -95,15 +95,14 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {     
     //add vision position estimates to odometry calculations.
-    //var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
-    //if(visionPoseEstimate != null && m_vision != null){
-    //  m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
-    //}
+    if(Constants.DriveConstants.enableVision){
+      var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+      if(visionPoseEstimate != null){
+        m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
+      }
+    }
 
     //update odometry with swerve module positions
-    //System.out.println(m_rearRight.swervePosition.distanceMeters);
-    //System.out.println(m_rearRight.swervePosition.angle);
-    //System.out.println("");
     m_odometry.update(       
       m_gyro.getRotation2d(),
       new SwerveModulePosition[] {
@@ -121,7 +120,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-
     return m_odometry.getEstimatedPosition();//.getEstimatedPosition();
   }
 

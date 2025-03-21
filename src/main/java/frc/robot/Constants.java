@@ -23,10 +23,11 @@ public final class Constants {
 
   public static final class DriveConstants {
     public static boolean enableDrive = false;
-    public static boolean enableLadder = true;
+    public static boolean enableLadder = false;
     public static boolean enableLift = false;
     public static boolean enableIntake = false;
     public static boolean enableBallHolder = false;
+    public static boolean enableVision = false;
 
     public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
     public static final int kRearLeftDriveMotorPort = enableDrive ? 7 : 0;

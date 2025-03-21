@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -18,13 +19,16 @@ import frc.robot.commands.Constructors.PathMaker;
 import frc.robot.commands.Intake.IntakeIn;
 import frc.robot.commands.Intake.IntakeOut;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
 
@@ -48,15 +52,12 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final Joystick m_driverRJoystick = new Joystick(OIConstants.kRightJoystickPort);
 
-  DoublePublisher ladderHeightPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Lift Height").publish();
-  DoublePublisher targetHeightPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Target lift Height").publish();
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     
     configureButtonBindings();
-
+    initDashboard();
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -92,6 +93,9 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 3).whileTrue(new IntakeIn(m_intake)); //X Button on Xbox
     new JoystickButton(m_driverController, 2).whileTrue(new IntakeOut(m_intake)); //B Button on Xbox
 
+    new JoystickButton(m_driverController, 1).onTrue(
+     PathMaker.createPathLocal(m_robotDrive, new Transform2d(),List.of()) 
+    );
 
 
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
@@ -101,12 +105,22 @@ public class RobotContainer {
     // cancelling on release.
     //m_driverController.b(0).whileTrue();
   }
-  public void updateNetworkTables(){
-    ladderHeightPublisher.set(m_ladder.getHeight());
-    targetHeightPublisher.set(m_ladder.m_targetPosition);
+
+  public void initDashboard(){
+    SmartDashboard.putData("Lift Zero", new LadderMoveToPosition(m_ladder, 1000));
+    SmartDashboard.putData("Intake In", new IntakeIn(m_intake));
+    SmartDashboard.putData("Intake Out", new IntakeOut(m_intake));    
+  }
+  public void updateDashboard(){
+    SmartDashboard.putNumber("Lift Height", m_ladder.getHeight());
+    SmartDashboard.putNumber("Lift Target Height", m_ladder.m_targetPosition);
+    SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
   }
   public void periodic() {
-    updateNetworkTables();
+    updateDashboard();
+    if(Timer.getMatchTime() < 3 && Timer.getMatchTime() != 0 ){
+      CommandScheduler.getInstance().schedule(new LadderMoveToPosition(m_ladder, 1000));
+    }
     //m_robotDrive.changeMaxSpeed(m_driverRJoystick.getRawAxis(0));    
   }
 
@@ -126,7 +140,6 @@ public class RobotContainer {
       false));
       */
   }
-
   public Command getTestCommand(int testNumber){
     switch(testNumber){
       case 1: 
