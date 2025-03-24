@@ -35,12 +35,12 @@ public class ReefMoveAndLift {
         switch (stalk) {
             //Left stalk
             case 1:
-                pathMaker.createPathGlobal(drive, drive.getPose().plus(robotToTag).plus(tagToLeftStalk), List.of());
+                //pathMaker.createPathGlobal(drive, drive.getPose().plus(robotToTag).plus(tagToLeftStalk), List.of());
                 break;
 
             //Right stalk
             case 2:
-                pathMaker.createPathGlobal(drive, drive.getPose().plus(robotToTag).plus(tagToRightStalk), List.of());
+                //spathMaker.createPathGlobal(drive, drive.getPose().plus(robotToTag).plus(tagToRightStalk), List.of());
                 break;
             
             default:

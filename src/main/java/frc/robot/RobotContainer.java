@@ -80,17 +80,12 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
-    //
-    //new JoystickButton(m_driverRJoystick,5).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.topStalkPosition)); //Top Left Button > Top Stick
-    //new JoystickButton(m_driverJoystick,3).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.middleStalkPosition)); //Bottom Left > Middle Stick
+  private void configureButtonBindings() {  
     new POVButton(m_driverController,90).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.bottomStalkPosition)); //Bottom Right > Bottom Stick
     new POVButton(m_driverController,180).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.zeroPosition)); //Top Right > Intake*/
     new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.middleStalkPosition)); //Top Right > Intake*/
     //new POVButton(m_driverController, 90).whileTrue(new IntakeOut(m_intake));//new LadderMoveToPosition(m_ladder, ladderTargetHeight));
-
     new JoystickButton(m_driverController, 2).whileTrue(new IntakeIn(m_intake)); //B Button on Xbox
-
     new JoystickButton(m_driverController, 6).whileTrue(new IntakeOut(m_intake)); //Top Right Button on Xbox
 
 
@@ -110,7 +105,8 @@ public class RobotContainer {
   public void initDashboard(){
     SmartDashboard.putData("Lift Zero", new LadderMoveToPosition(m_ladder, 1000));
     SmartDashboard.putData("Intake In", new IntakeIn(m_intake));
-    SmartDashboard.putData("Intake Out", new IntakeOut(m_intake));    
+    SmartDashboard.putData("Intake Out", new IntakeOut(m_intake));
+    SmartDashboard.putData("PathMakerTest", new PathMaker().createPath(m_robotDrive, new Pose2d(2,0,new Rotation2d(0)), List.of(), false));
   }
   public void updateDashboard(){
     SmartDashboard.putNumber("Lift Height", m_ladder.getHeight());
@@ -155,16 +151,13 @@ public class RobotContainer {
       */
   
   public Command getTestCommand(int testNumber){
-    return new Command(){};/*switch(testNumber){
+    switch(testNumber){
       case 1: 
-        return pathMaker.createPathGlobal(
+        return pathMaker.createPath(
           m_robotDrive,
-          new Pose2d(2, 2, new Rotation2d(0)),
-          List.of());/* .andThen(pathMaker.createPath(
-          m_robotDrive, 
-          new Pose2d(0,2, new Rotation2d(0)),
+          new Pose2d(10, 0, new Rotation2d(0)),
           List.of(),
-          true)
+          false
         );
       case 2:
         return new LadderMoveToPosition(m_ladder, 5000).withTimeout(5).andThen(new LadderMoveToPosition(m_ladder, 0));
@@ -172,7 +165,7 @@ public class RobotContainer {
         return new Command() {
           
         };
-        */
+        
     }
   }
-
+}

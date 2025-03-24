@@ -18,6 +18,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.Constants.ModuleConstants;
@@ -41,11 +43,11 @@ public class SwerveModule {
   private final ProfiledPIDController m_drivePIDController =
       new ProfiledPIDController(
         ModuleConstants.kPModuleDriveController,
-        0,
-        0,
+        0.0025,
+        0.002,
         new TrapezoidProfile.Constraints(
           DriveConstants.kMaxSpeedMetersPerSecond,
-          20));
+          500));
 
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
 
@@ -54,7 +56,7 @@ public class SwerveModule {
   private final ProfiledPIDController m_turningPIDController =
       new ProfiledPIDController(
           ModuleConstants.kPModuleTurningController,
-          0,
+          0.05,
           0,
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
@@ -171,4 +173,5 @@ public class SwerveModule {
     m_driveMotor.setPosition(0);
     m_turningEncoderNew.setPosition(0);
   }
+
 }

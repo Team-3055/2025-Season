@@ -140,6 +140,10 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
+  public void resetGyro() {
+    m_gyro.reset();
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
