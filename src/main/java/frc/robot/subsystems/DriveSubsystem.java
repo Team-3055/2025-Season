@@ -36,7 +36,7 @@ public class DriveSubsystem extends SubsystemBase {
   StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
     .getStructTopic("MyPose", Pose2d.struct).publish();
 
-  private final SwerveModule m_frontLeft =
+  public final SwerveModule m_frontLeft =
       new SwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
           DriveConstants.kFrontLeftTurningMotorPort,
@@ -44,7 +44,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
-  private final SwerveModule m_rearLeft =
+  public final SwerveModule m_rearLeft =
       new SwerveModule(
           DriveConstants.kRearLeftDriveMotorPort,
           DriveConstants.kRearLeftTurningMotorPort,
@@ -52,7 +52,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
-  private final SwerveModule m_frontRight =
+  public final SwerveModule m_frontRight =
       new SwerveModule(
           DriveConstants.kFrontRightDriveMotorPort,
           DriveConstants.kFrontRightTurningMotorPort,
@@ -60,7 +60,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
-  private final SwerveModule m_rearRight =
+  public final SwerveModule m_rearRight =
       new SwerveModule(
           DriveConstants.kRearRightDriveMotorPort,
           DriveConstants.kRearRightTurningMotorPort,
@@ -68,7 +68,7 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
-  private final VisionSubsystem m_vision = Constants.DriveConstants.enableVision ? new VisionSubsystem() : null;
+  //private final VisionSubsystem m_vision = Constants.DriveConstants.enableVision ? new VisionSubsystem() : null;
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
@@ -95,12 +95,12 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {     
     //add vision position estimates to odometry calculations.
-    if(Constants.DriveConstants.enableVision){
+    /*if(Constants.DriveConstants.enableVision){
       var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
       if(visionPoseEstimate != null){
         m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
       }
-    }
+    }*/
 
     //update odometry with swerve module positions
     m_odometry.update(       

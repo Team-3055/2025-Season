@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,13 +21,12 @@ import frc.robot.commands.Intake.IntakeIn;
 import frc.robot.commands.Intake.IntakeOut;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -68,14 +68,12 @@ public class RobotContainer {
                     // Multiply by max speed to map the joystick unitless inputs to actual units.
                     // This will map the [-1, 1] to [max speed backwards, max speed forwards],
                     // converting them to actual units.
-                    Math.abs(m_driverController.getLeftX()) + Math.abs(m_driverController.getLeftY()) > 0.25 ? - m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    Math.abs(m_driverController.getLeftX()) + Math.abs(m_driverController.getLeftY()) > 0.25 ? - m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    ((m_driverController.getRawAxis(5) * 0.5) - (m_driverController.getRawAxis(4) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
-                    //m_driverController.getRawAxis(2) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-                    true),
+                    Math.abs(m_driverController.getRawAxis(5)) > 0.05 ? -m_driverController.getRawAxis(5) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
+                    Math.abs(m_driverController.getRawAxis(4)) > 0.05 ? -m_driverController.getRawAxis(4) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
+                    ((m_driverController.getRawAxis(1) * 0.5) - (m_driverController.getRawAxis(0) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
+                    false),
             m_robotDrive));
   }
-
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
@@ -84,18 +82,21 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     //
-    //new JoystickButton(m_driverRJoystick,5).whileTrue(new LadderMoveToPosition(m_ladder, 9000)); //Top Left Button > Top Stick
-    //new JoystickButton(m_driverRJoystick,3).whileTrue(new LadderMoveToPosition(m_ladder, 6000)); //Bottom Left > Middle Stick
-    //new JoystickButton(m_driverRJoystick,4).whileTrue(new LadderMoveToPosition(m_ladder, 3000)); //Bottom Right > Bottom Stick
-    new JoystickButton(m_driverRJoystick,6).whileTrue(new LadderMoveToPosition(m_ladder, 3000)); //Top Right > Intake*/
-    new JoystickButton(m_driverRJoystick,2).whileTrue(new LadderMoveToPosition(m_ladder, 1000)); //Thumb Button 
+    //new JoystickButton(m_driverRJoystick,5).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.topStalkPosition)); //Top Left Button > Top Stick
+    //new JoystickButton(m_driverJoystick,3).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.middleStalkPosition)); //Bottom Left > Middle Stick
+    new POVButton(m_driverController,90).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.bottomStalkPosition)); //Bottom Right > Bottom Stick
+    new POVButton(m_driverController,180).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.zeroPosition)); //Top Right > Intake*/
+    new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.middleStalkPosition)); //Top Right > Intake*/
+    //new POVButton(m_driverController, 90).whileTrue(new IntakeOut(m_intake));//new LadderMoveToPosition(m_ladder, ladderTargetHeight));
 
-    new JoystickButton(m_driverController, 3).whileTrue(new IntakeIn(m_intake)); //X Button on Xbox
-    new JoystickButton(m_driverController, 2).whileTrue(new IntakeOut(m_intake)); //B Button on Xbox
+    new JoystickButton(m_driverController, 2).whileTrue(new IntakeIn(m_intake)); //B Button on Xbox
 
-    new JoystickButton(m_driverController, 1).onTrue(
+    new JoystickButton(m_driverController, 6).whileTrue(new IntakeOut(m_intake)); //Top Right Button on Xbox
+
+
+    /*new JoystickButton(m_driverController, 1).onTrue(
      PathMaker.createPathLocal(m_robotDrive, new Transform2d(),List.of()) 
-    );
+    );*/
 
 
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
@@ -118,8 +119,10 @@ public class RobotContainer {
   }
   public void periodic() {
     updateDashboard();
-    if(Timer.getMatchTime() < 3 && Timer.getMatchTime() != 0 ){
-      CommandScheduler.getInstance().schedule(new LadderMoveToPosition(m_ladder, 1000));
+    if(Timer.getMatchTime() < 3 && Timer.getMatchTime() != -1){
+      CommandScheduler.getInstance().schedule(new LadderMoveToPosition(m_ladder, Constants.OIConstants.zeroPosition));
+      System.out.println(Timer.getMatchTime());
+      SmartDashboard.putString("Status", "Auto Retracting Ladder");
     }
     //m_robotDrive.changeMaxSpeed(m_driverRJoystick.getRawAxis(0));    
   }
@@ -129,37 +132,47 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    return PathMaker.createPathLocal(
-      m_robotDrive,
-      new Transform2d(-1, 0, new Rotation2d(0)),
-      List.of());/*.andThen(pathMaker.createPath(
+  public Command getAutonomousCommand(int autoNumber) {
+  //   if (Timer.getMatchTime() > 13) {
+  //   m_robotDrive.m_frontLeft.m_driveMotor.set(0.4);
+  //   m_robotDrive.m_frontLeft.m_turningMotor.set(autoNumber);
+  // }
+    ParallelRaceGroup cmd = new RunCommand(()->m_robotDrive.drive(2,0,0,false)).withTimeout(3);
+   return cmd;
+  }
+    // return PathMaker.createPathGlobal(
+    //     m_robotDrive,
+    //     new Pose2d(1, 0, new Rotation2d(0)),
+    //     List.of());
+    // }  
+
+      
+      /*.andThen(pathMaker.createPath(
       m_robotDrive,
       new Pose2d(-3,-3, new Rotation2d(0)),
       List.of(new Translation2d(-3,0)),
       false));
       */
-  }
+  
   public Command getTestCommand(int testNumber){
-    switch(testNumber){
+    return new Command(){};/*switch(testNumber){
       case 1: 
-        return pathMaker.createPathLocal(
+        return pathMaker.createPathGlobal(
           m_robotDrive,
-          new Transform2d(2, 2, new Rotation2d(0)),
+          new Pose2d(2, 2, new Rotation2d(0)),
           List.of());/* .andThen(pathMaker.createPath(
           m_robotDrive, 
           new Pose2d(0,2, new Rotation2d(0)),
           List.of(),
           true)
-        );*/
+        );
       case 2:
         return new LadderMoveToPosition(m_ladder, 5000).withTimeout(5).andThen(new LadderMoveToPosition(m_ladder, 0));
       default:
         return new Command() {
           
         };
-        
+        */
     }
   }
-}
 

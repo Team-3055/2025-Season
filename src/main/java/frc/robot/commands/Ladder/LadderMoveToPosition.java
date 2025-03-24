@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Ladder;
 
+import frc.robot.Constants;
 import frc.robot.subsystems.LadderSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -47,6 +48,7 @@ public class LadderMoveToPosition extends Command {
   @Override
   public void end(boolean interrupted) {
     //m_ladder.moveToHeight(0);
+    //m_ladder.moveToHeight(Constants.OIConstants.zeroPosition);
   }
 
   // Returns true when the command should end.

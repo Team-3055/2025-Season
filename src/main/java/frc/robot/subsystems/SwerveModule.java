@@ -25,8 +25,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 
 public class SwerveModule {
-  private final TalonFX m_driveMotor;
-  private final TalonFX m_turningMotor;
+  public final TalonFX m_driveMotor;
+  public final TalonFX m_turningMotor;
   private final CANcoder m_turningEncoderNew;
   
   private final int turningEncoderReversed;
@@ -45,7 +45,7 @@ public class SwerveModule {
         0,
         new TrapezoidProfile.Constraints(
           DriveConstants.kMaxSpeedMetersPerSecond,
-          15));
+          20));
 
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
 

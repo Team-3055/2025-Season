@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
@@ -24,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class LadderSubsystem extends SubsystemBase {
@@ -46,13 +48,14 @@ public class LadderSubsystem extends SubsystemBase {
     m_ladderMotor1.setInverted(true);
     m_ladderMotor1.configPeakOutputForward(1);
     m_ladderMotor2.configPeakOutputForward(1);
+    
     //m_ladderMotor2.configPeakCurrentDuration(3000);
 
-    m_ladderMotor1.config_kP(0, 0.1);
+    m_ladderMotor1.config_kP(0, 0.05);
     m_ladderMotor1.config_kI(0, 0);
     m_ladderMotor1.config_kD(0, 0);
-    m_ladderMotor1.config_kF(0, 0.13);
- 
+    m_ladderMotor1.config_kF(0, 0.07);
+    //m_ladderMotor1.setNeutralMode(NeutralMode.Brake);
     m_ladderMotor1.configAllowableClosedloopError(0, 100);
     m_ladderMotor2.follow(m_ladderMotor1);
   }
@@ -69,6 +72,6 @@ public class LadderSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     m_ladderMotor1.set(ControlMode.Position, m_targetPosition);
-    
+    SmartDashboard.putNumber("Lift Height", m_ladderMotor1.getSelectedSensorPosition());
   }
 }

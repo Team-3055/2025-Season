@@ -42,7 +42,7 @@ public class PathMaker {
                 // Start at the origin facing the +X direction
                 m_drive.getPose(),
                 //Pass in points the robot should go through          
-                m_transitionPoses,
+                List.of(new Translation2d(1,0)),
                 //final pose of the robot
                 m_finalPose,
                 m_config);
@@ -60,8 +60,8 @@ public class PathMaker {
                 DriveConstants.kDriveKinematics,
 
                 // Position controllers
-                new PIDController(AutoConstants.kPXController, 0.5, 0),
-                new PIDController(AutoConstants.kPYController, 0.5, 0),
+                new PIDController(AutoConstants.kPXController, 0, 0.25),
+                new PIDController(AutoConstants.kPYController, 0, 0.25),
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
@@ -69,7 +69,7 @@ public class PathMaker {
             swerveControllerCommand);
         return commandSequence;
     }
-    public static Command createPathLocal(DriveSubsystem m_drive, Transform2d m_finalPoseTransform, List<Translation2d> m_transitionPoses){
+    /*public static Command createPathLocal(DriveSubsystem m_drive, Transform2d m_finalPoseTransform, List<Translation2d> m_transitionPoses){
 
         final TrajectoryConfig m_config =
         new TrajectoryConfig(
@@ -110,5 +110,7 @@ public class PathMaker {
         Command commandSequence = Commands.sequence(
             swerveControllerCommand);
         return commandSequence;
-    } 
+    
+    }
+        */ 
 }

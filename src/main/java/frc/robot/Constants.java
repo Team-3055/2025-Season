@@ -22,7 +22,7 @@ public final class Constants {
 
 
   public static final class DriveConstants {
-    public static boolean enableDrive = false;
+    public static boolean enableDrive = true;
     public static boolean enableLadder = false;
     public static boolean enableLift = false;
     public static boolean enableIntake = false;
@@ -84,7 +84,7 @@ public final class Constants {
   }
 
   public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
+    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4 * Math.PI;
 
     public static final int kEncoderCPR = 4096;
@@ -102,7 +102,7 @@ public final class Constants {
 
     public static final double kPModuleTurningController = 3;
 
-    public static final double kPModuleDriveController = 0.6;
+    public static final double kPModuleDriveController = 0.5;
   }
 
   public static final class OIConstants {
@@ -118,9 +118,13 @@ public final class Constants {
    
     public static final int kRightJoystickPort = 1;
     public static final int ladderShooterPort = 12;
+    public static final int topStalkPosition = 26900;
+    public static final int middleStalkPosition = 13040;
+    public static final int bottomStalkPosition = 6500;//4630;
+    public static final int zeroPosition = 1500;
 
     public static final int intakeMotorPort = DriveConstants.enableIntake == true ? 14 : 0;
-    public static final double intakeSpeed = 0.25;
+    public static final double intakeSpeed = 0.5;
   }
 
   public static final class AutoConstants {
@@ -129,8 +133,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = 2* Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
+    public static final double kPXController = 0.5;
+    public static final double kPYController = 0.5;
     public static final double kPThetaController = 1;
 
     // Constraint for the motion profiled robot angle controller
