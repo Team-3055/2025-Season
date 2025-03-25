@@ -105,12 +105,17 @@ public final class Constants {
     public static final double kPModuleDriveController = 0.7;
   }
 
-  public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+  public static final class LadderConstants {
     public static final int ladderMotorPort1 = DriveConstants.enableLadder == true ? 10 : 0;
     public static final int ladderMotorPort2 = DriveConstants.enableLadder == true ? 11 : 0;
     public static final double ladderMotorSpeed = 1.00;
-
+    public static final int topStalkPosition = 26900;
+    public static final int middleStalkPosition = 13040;
+    public static final int bottomStalkPosition = 6500;//4630;
+    public static final int zeroPosition = 1500;
+  }
+  public static final class OIConstants {
+    public static final int kDriverControllerPort = 0;
     public static final int ballHolder = DriveConstants.enableLadder == true ? 11 : 0;
 
     public static final int liftMotorPort = DriveConstants.enableLift ? 12 : 0;
@@ -118,10 +123,7 @@ public final class Constants {
    
     public static final int kRightJoystickPort = 1;
     public static final int ladderShooterPort = 12;
-    public static final int topStalkPosition = 26900;
-    public static final int middleStalkPosition = 13040;
-    public static final int bottomStalkPosition = 6500;//4630;
-    public static final int zeroPosition = 1500;
+    
 
     public static final int intakeMotorPort = DriveConstants.enableIntake == true ? 14 : 0;
     public static final double intakeSpeed = 0.5;

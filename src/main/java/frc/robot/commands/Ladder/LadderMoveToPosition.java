@@ -7,8 +7,6 @@ package frc.robot.commands.Ladder;
 import frc.robot.Constants;
 import frc.robot.subsystems.LadderSubsystem;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 

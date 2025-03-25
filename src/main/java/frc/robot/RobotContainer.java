@@ -17,6 +17,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LadderSubsystem;
 import frc.robot.commands.Ladder.LadderMoveToPosition;
 import frc.robot.commands.Constructors.PathMaker;
+import frc.robot.commands.Constructors.ReefMoveAndLift;
 import frc.robot.commands.Intake.IntakeIn;
 import frc.robot.commands.Intake.IntakeOut;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +32,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
+
+import com.fasterxml.jackson.core.JsonLocation;
 
 
 /*
@@ -48,6 +51,8 @@ public class RobotContainer {
   public double ladderTargetHeight = 0;
   public ShuffleboardTab tab;
   public PathMaker pathMaker = new PathMaker();
+  public ReefMoveAndLift reefPathMaker = new ReefMoveAndLift();
+
   // The driver's controller
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final Joystick m_driverRJoystick = new Joystick(OIConstants.kRightJoystickPort);
@@ -81,14 +86,26 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {  
-    new POVButton(m_driverController,90).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.bottomStalkPosition)); //Bottom Right > Bottom Stick
-    new POVButton(m_driverController,180).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.zeroPosition)); //Top Right > Intake*/
-    new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.OIConstants.middleStalkPosition)); //Top Right > Intake*/
+    new POVButton(m_driverController,90).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition)); //Bottom Right > Bottom Stick
+    new POVButton(m_driverController,180).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition)); //Top Right > Intake*/
+    new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition)); //Top Right > Intake*/
     //new POVButton(m_driverController, 90).whileTrue(new IntakeOut(m_intake));//new LadderMoveToPosition(m_ladder, ladderTargetHeight));
     new JoystickButton(m_driverController, 2).whileTrue(new IntakeIn(m_intake)); //B Button on Xbox
     new JoystickButton(m_driverController, 6).whileTrue(new IntakeOut(m_intake)); //Top Right Button on Xbox
 
-
+    //Left L1
+    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //Left L2
+    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 2, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //Left L3
+    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 3, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //Right L1
+    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 1, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //Right L2
+    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2,2, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //Right L3
+    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 3, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    
     /*new JoystickButton(m_driverController, 1).onTrue(
      PathMaker.createPathLocal(m_robotDrive, new Transform2d(),List.of()) 
     );*/
@@ -116,7 +133,7 @@ public class RobotContainer {
   public void periodic() {
     updateDashboard();
     if(Timer.getMatchTime() < 3 && Timer.getMatchTime() != -1){
-      CommandScheduler.getInstance().schedule(new LadderMoveToPosition(m_ladder, Constants.OIConstants.zeroPosition));
+      CommandScheduler.getInstance().schedule(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition));
       System.out.println(Timer.getMatchTime());
       SmartDashboard.putString("Status", "Auto Retracting Ladder");
     }

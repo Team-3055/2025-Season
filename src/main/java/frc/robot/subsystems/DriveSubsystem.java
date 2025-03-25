@@ -68,11 +68,13 @@ public class DriveSubsystem extends SubsystemBase {
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
-  //private final VisionSubsystem m_vision = Constants.DriveConstants.enableVision ? new VisionSubsystem() : null;
+  public final VisionSubsystem m_vision = Constants.DriveConstants.enableVision ? new VisionSubsystem() : null;
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
   
+  private Pose2d relativePose = new Pose2d();
+
   // Odometry class for tracking robot pose
   SwerveDrivePoseEstimator m_odometry = 
     new SwerveDrivePoseEstimator(
@@ -121,6 +123,13 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getEstimatedPosition();//.getEstimatedPosition();
+  }
+  public Pose2d getRelativePose(){
+    return m_odometry.getEstimatedPosition().relativeTo(relativePose);
+  }
+
+  public void setRelativePose(Pose2d pose){
+    relativePose = pose;
   }
 
   /**

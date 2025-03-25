@@ -60,13 +60,16 @@ public class PathMaker {
         ProfiledPIDController thetaController =
             new ProfiledPIDController(
                 AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);  
+
+        if(!globalPosBoolean){
+            m_drive.setRelativePose(m_drive.getPose());
+        }
 
         SwerveControllerCommand swerveControllerCommand =
-
             new SwerveControllerCommand(
                 robotTrajectory,
-                m_drive::getPose, // Functional interface to feed supplier
+                globalPosBoolean == true ? m_drive::getPose : m_drive::getRelativePose, // Functional interface to feed supplier
                 DriveConstants.kDriveKinematics,
 
                 // Position controllers

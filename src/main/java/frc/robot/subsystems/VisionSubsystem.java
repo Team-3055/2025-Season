@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
+import org.opencv.core.TermCriteria;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -17,6 +18,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,6 +34,7 @@ public class VisionSubsystem extends SubsystemBase {
   static PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(tagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, frontCameraToRobot);
   static PhotonPipelineResult frontCameraResult;
   static PhotonPipelineResult backCameraResult;
+  static List<Integer> reefIds= List.of(6,7,8,9,10,11,17,18,19,20,21,22);
 
   PhotonCamera frontCamera = new PhotonCamera("FrontCam");
   PhotonCamera backCamera = new PhotonCamera("BackCam");
@@ -71,6 +74,19 @@ public class VisionSubsystem extends SubsystemBase {
       if(!targetResults.isEmpty()){
         Transform3d targetToRobot = targetResults.get(0).getBestCameraToTarget().inverse().plus(frontCameraToRobot);
         return new Pose2d(targetToRobot.getTranslation().toTranslation2d(), targetToRobot.getRotation().toRotation2d());
+      }
+    }
+    return null;
+  }
+
+  public Transform2d getReefTransform(){
+    if(frontCamera.isConnected()){
+      List<PhotonTrackedTarget> targetResults = frontCameraResult.getTargets();
+      if(!targetResults.isEmpty()){
+        if(reefIds.contains(targetResults.get(0).fiducialId)){
+          Transform3d robotToTarget = targetResults.get(0).getBestCameraToTarget().inverse().plus(frontCameraToRobot).inverse();
+          return new Transform2d(robotToTarget.getTranslation().toTranslation2d(), robotToTarget.getRotation().toRotation2d());
+        }
       }
     }
     return null;

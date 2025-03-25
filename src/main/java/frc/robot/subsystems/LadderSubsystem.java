@@ -15,6 +15,8 @@ import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import frc.robot.Constants.LadderConstants;
 import frc.robot.Constants.OIConstants;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -31,8 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class LadderSubsystem extends SubsystemBase {
   public double m_targetPosition = 0;
 
-  public final WPI_TalonSRX m_ladderMotor1 = new WPI_TalonSRX(OIConstants.ladderMotorPort1);
-  private final WPI_TalonSRX m_ladderMotor2 = new WPI_TalonSRX(OIConstants.ladderMotorPort2);
+  public final WPI_TalonSRX m_ladderMotor1 = new WPI_TalonSRX(LadderConstants.ladderMotorPort1);
+  private final WPI_TalonSRX m_ladderMotor2 = new WPI_TalonSRX(LadderConstants.ladderMotorPort2);
   private final double m_encoderTickPerMeter = 1;
   private final double m_meterPerEncoderTick = 1/m_encoderTickPerMeter;
 
