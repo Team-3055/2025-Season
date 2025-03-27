@@ -6,8 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -32,9 +30,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
-
-import com.fasterxml.jackson.core.JsonLocation;
-
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -73,11 +68,12 @@ public class RobotContainer {
                     // Multiply by max speed to map the joystick unitless inputs to actual units.
                     // This will map the [-1, 1] to [max speed backwards, max speed forwards],
                     // converting them to actual units.
-                    Math.abs(m_driverController.getRawAxis(5)) > 0.05 ? -m_driverController.getRawAxis(5) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    Math.abs(m_driverController.getRawAxis(4)) > 0.05 ? -m_driverController.getRawAxis(4) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    ((m_driverController.getRawAxis(1) * 0.5) - (m_driverController.getRawAxis(0) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
+                    Math.abs(m_driverController.getRawAxis(1)) > 0.05 ? -m_driverController.getRawAxis(1) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
+                    Math.abs(m_driverController.getRawAxis(0)) > 0.05 ? -m_driverController.getRawAxis(0) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
+                    ((m_driverController.getRawAxis(5) * 0.5) - (m_driverController.getRawAxis(4) * 0.5)) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,                    
                     false),
             m_robotDrive));
+
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -91,20 +87,21 @@ public class RobotContainer {
     new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition)); //Top Right > Intake*/
     //new POVButton(m_driverController, 90).whileTrue(new IntakeOut(m_intake));//new LadderMoveToPosition(m_ladder, ladderTargetHeight));
     new JoystickButton(m_driverController, 2).whileTrue(new IntakeIn(m_intake)); //B Button on Xbox
-    new JoystickButton(m_driverController, 6).whileTrue(new IntakeOut(m_intake)); //Top Right Button on Xbox
-
+    new JoystickButton(m_driverController, 6).onTrue(new IntakeIn(m_intake)); //B Button on Xbox
+    new JoystickButton(m_driverController, 3).whileTrue(reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake)); //Top Right Button on Xbox
+  
     //Left L1
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake);
     //Left L2
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 2, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 2, m_ladder, m_robotDrive, m_intake);
     //Left L3
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 3, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(1, 3, m_ladder, m_robotDrive, m_intake);
     //Right L1
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 1, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 1, m_ladder, m_robotDrive, m_intake);
     //Right L2
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2,2, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 2, m_ladder, m_robotDrive, m_intake);
     //Right L3
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 3, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
+    //new JoystickButton(m_driverRJoystick, 0).whileTrue(reefPathMaker.createCommand(2, 3, m_ladder, m_robotDrive, m_intake);
     
     /*new JoystickButton(m_driverController, 1).onTrue(
      PathMaker.createPathLocal(m_robotDrive, new Transform2d(),List.of()) 
@@ -123,7 +120,7 @@ public class RobotContainer {
     SmartDashboard.putData("Lift Zero", new LadderMoveToPosition(m_ladder, 1000));
     SmartDashboard.putData("Intake In", new IntakeIn(m_intake));
     SmartDashboard.putData("Intake Out", new IntakeOut(m_intake));
-    SmartDashboard.putData("PathMakerTest", new PathMaker().createPath(m_robotDrive, new Pose2d(2,0,new Rotation2d(0)), List.of(), false));
+    //SmartDashboard.putData(reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake, m_robotDrive.m_vision.getReefTransform()));
   }
   public void updateDashboard(){
     SmartDashboard.putNumber("Lift Height", m_ladder.getHeight());
@@ -132,9 +129,13 @@ public class RobotContainer {
   }
   public void periodic() {
     updateDashboard();
+
+    if(m_robotDrive.m_vision.cameraConnected){
+      m_robotDrive.m_vision.getReefTransform();
+    }
+
     if(Timer.getMatchTime() < 3 && Timer.getMatchTime() != -1){
       CommandScheduler.getInstance().schedule(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition));
-      System.out.println(Timer.getMatchTime());
       SmartDashboard.putString("Status", "Auto Retracting Ladder");
     }
     //m_robotDrive.changeMaxSpeed(m_driverRJoystick.getRawAxis(0));    
@@ -172,12 +173,20 @@ public class RobotContainer {
       case 1: 
         return pathMaker.createPath(
           m_robotDrive,
-          new Pose2d(10, 0, new Rotation2d(0)),
+          new Pose2d(5, 0, new Rotation2d(0)),
           List.of(),
-          false
-        );
+          true
+        )
+        .andThen((new IntakeOut(m_intake)).withTimeout(3))
+        //.withTimeout(5)
+        .andThen(pathMaker.createPath(
+          m_robotDrive,
+          new Pose2d(5, 5, new Rotation2d(0)),
+          List.of(),
+          true
+        ));
       case 2:
-        return new LadderMoveToPosition(m_ladder, 5000).withTimeout(5).andThen(new LadderMoveToPosition(m_ladder, 0));
+        return reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake);
       default:
         return new Command() {
           

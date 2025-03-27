@@ -27,7 +27,8 @@ public final class Constants {
     public static boolean enableLift = false;
     public static boolean enableIntake = false;
     public static boolean enableBallHolder = false;
-    public static boolean enableVision = false;
+    public static boolean enableVision = true;
+  
 
     public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
     public static final int kRearLeftDriveMotorPort = enableDrive ? 7 : 0;
@@ -80,7 +81,7 @@ public final class Constants {
     public static final double kVoltsPerRotation = 60/523;
     public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 5;
+    public static final double kMaxSpeedMetersPerSecond = 0.5; 
   }
 
   public static final class ModuleConstants {
@@ -130,13 +131,13 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxAutoSpeedMetersPerSecond = 3;
+    public static final double kMaxAutoSpeedMetersPerSecond = 0.5;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = 2* Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
+    public static final double kPXController = 10;
+    public static final double kPYController = 10;
     public static final double kPThetaController = 1;
 
     // Constraint for the motion profiled robot angle controller

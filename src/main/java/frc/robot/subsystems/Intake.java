@@ -4,11 +4,13 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants.OIConstants;
 
+@Logged
 public class Intake extends SubsystemBase {
   public WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(OIConstants.intakeMotorPort);
   private double motorSpeed = OIConstants.intakeSpeed;

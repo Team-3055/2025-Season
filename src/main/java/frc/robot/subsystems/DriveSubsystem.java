@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -25,6 +26,7 @@ import frc.robot.Constants.DriveConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@Logged
 public class DriveSubsystem extends SubsystemBase {
   // Robot swerve modules
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -95,7 +97,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   
   @Override
-  public void periodic() {     
+  public void periodic() {
+    if(m_vision != null){
+      m_vision.updateCamera();
+    }
     //add vision position estimates to odometry calculations.
     /*if(Constants.DriveConstants.enableVision){
       var visionPoseEstimate = m_vision.getEstimatedGlobalPose();

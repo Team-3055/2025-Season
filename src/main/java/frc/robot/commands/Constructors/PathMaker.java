@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -59,7 +60,7 @@ public class PathMaker {
 
         ProfiledPIDController thetaController =
             new ProfiledPIDController(
-                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+                AutoConstants.kPThetaController, 5, 0, AutoConstants.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);  
 
         if(!globalPosBoolean){
@@ -73,8 +74,8 @@ public class PathMaker {
                 DriveConstants.kDriveKinematics,
 
                 // Position controllers
-                new PIDController(AutoConstants.kPXController, 3, 0),
-                new PIDController(AutoConstants.kPYController, 3, 0),
+                new PIDController(AutoConstants.kPXController, 25, 0),
+                new PIDController(AutoConstants.kPYController, 25, 0),
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
