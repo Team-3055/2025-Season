@@ -6,11 +6,9 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
-import org.opencv.core.TermCriteria;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -19,16 +17,12 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @Logged
@@ -38,7 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
   static AprilTagFieldLayout tagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   public boolean cameraConnected = true; 
   
-  static Transform3d robotToFrontCamera = new Transform3d(new Translation3d(0.305,-0.305,-0.1), new Rotation3d(0,0,0));
+  static Transform3d robotToFrontCamera = new Transform3d(new Translation3d(0.305,-0.305,0.1), new Rotation3d(0,0,0));
   static PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(tagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToFrontCamera);
   static PhotonPipelineResult frontCameraResult;
   static PhotonPipelineResult backCameraResult;
@@ -99,11 +93,11 @@ public class VisionSubsystem extends SubsystemBase {
         if(targetResults != null){
           if(targetResults.size() != 0){
             if(reefIds.contains(targetResults.get(0).fiducialId) && targetResults.size() != 0){
-              Transform3d robotToTarget = robotToFrontCamera.plus(targetResults.get(0).getBestCameraToTarget()).inverse().plus(new Transform3d(new Translation3d(), new Rotation3d(0,0,-Math.PI)));
+              Transform3d robotToTarget = targetResults.get(0).getBestCameraToTarget().plus(new Transform3d(new Translation3d(), new Rotation3d(0,0,-Math.PI)));
               rotReefTransform.set(robotToTarget.getRotation().toRotation2d().getDegrees());
               xReefTransform.set(robotToTarget .getX());
               yReefTransform.set(robotToTarget.getY());
-              return new Transform2d(new Translation2d(robotToTarget.getTranslation().getY(), -robotToTarget.getTranslation().getX()), robotToTarget.getRotation().toRotation2d().rotateBy(new Rotation2d(Math.PI/2)));
+              return new Transform2d(robotToTarget.getTranslation().toTranslation2d(), robotToTarget.getRotation().toRotation2d());
             }
           }
         }

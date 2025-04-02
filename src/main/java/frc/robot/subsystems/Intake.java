@@ -12,7 +12,7 @@ import frc.robot.Constants.OIConstants;
 
 @Logged
 public class Intake extends SubsystemBase {
-  public WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(OIConstants.intakeMotorPort);
+  public WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(11);//OIConstants.intakeMotorPort);
   private double motorSpeed = OIConstants.intakeSpeed;
   /** Creates a new ExampleSubsystem. */
   public Intake() {}

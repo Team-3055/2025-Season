@@ -2,18 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Lift;
+package frc.robot.commands.Dealgaefier;
 
-import frc.robot.subsystems.LiftSubsystem;
+import frc.robot.subsystems.Dealgaefier;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.OIConstants;
 
 /** An example command that uses an example subsystem. */
-public class LiftUp extends Command {
+public class AlgaeIn extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 
-  private final LiftSubsystem m_subsystem;
-  double liftSpeed = 0.5;  
+  private final Dealgaefier m_subsystem;
 
   /**
    * Creates a new ExampleCommand.
@@ -21,7 +19,7 @@ public class LiftUp extends Command {
    * @param subsystem The subsystem used by this command.
    */
   
-  public LiftUp(LiftSubsystem subsystem) {
+  public AlgaeIn(Dealgaefier subsystem) {
     m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -34,7 +32,7 @@ public class LiftUp extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.feedForward(OIConstants.liftMotorReversed == false ? liftSpeed : -liftSpeed);
+    m_subsystem.algaeIn();
   }
 
   // Called once the command ends or is interrupted.

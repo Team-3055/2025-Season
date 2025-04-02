@@ -20,16 +20,15 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  */
 public final class Constants {
 
-
-  public static final class DriveConstants {
-    public static boolean enableDrive = true;
-    public static boolean enableLadder = false;
-    public static boolean enableLift = false;
-    public static boolean enableIntake = false;
-    public static boolean enableBallHolder = false;
-    public static boolean enableVision = true;
   
 
+  public static final class DriveConstants {
+    public static boolean enableDrive = false;
+    public static boolean enableLadder = true;
+    public static boolean enableIntake = false;
+    public static boolean enableDeAlgifier = false;
+    public static boolean enableVision = true;
+  
     public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
     public static final int kRearLeftDriveMotorPort = enableDrive ? 7 : 0;
     public static final int kFrontRightDriveMotorPort = enableDrive ? 3 : 0;
@@ -40,10 +39,10 @@ public final class Constants {
     public static final int kFrontRightTurningMotorPort = enableDrive ? 4 : 0;
     public static final int kRearRightTurningMotorPort = enableDrive ? 6 : 0;
 
-    public static final int kFrontLeftTurningEncoderPorts = 4;
-    public static final int kRearLeftTurningEncoderPorts = 2;
-    public static final int kFrontRightTurningEncoderPorts = 3; 
-    public static final int kRearRightTurningEncoderPorts = 1;
+    public static final int kFrontLeftTurningEncoderPorts = 1;
+    public static final int kRearLeftTurningEncoderPorts = 4;
+    public static final int kFrontRightTurningEncoderPorts = 2; 
+    public static final int kRearRightTurningEncoderPorts = 3;
     
     public static final boolean kFrontLeftTurningEncoderReversed = true;
     public static final boolean kRearLeftTurningEncoderReversed = true;
@@ -52,8 +51,8 @@ public final class Constants {
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
     public static final boolean kRearLeftDriveEncoderReversed = false;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed =  false;
+    public static final boolean kFrontRightDriveEncoderReversed = true;
+    public static final boolean kRearRightDriveEncoderReversed =  true;
 
     // If you call DriveSubsystem.drive() with a different period make sure to update this.
     public static final double kDrivePeriod = 0.02;// LoggedRobot.defaultPeriodSecs;
@@ -81,7 +80,11 @@ public final class Constants {
     public static final double kVoltsPerRotation = 60/523;
     public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 0.5; 
+    public static final double kMaxSpeedMetersPerSecond = 3; 
+  }
+
+  public class DashboardSettings {
+    
   }
 
   public static final class ModuleConstants {
@@ -101,43 +104,41 @@ public final class Constants {
         (2 * Math.PI) / (double) kEncoderCPR;
 
 
-    public static final double kPModuleTurningController = 3;
+    public static final double kPModuleTurningController = 10;
 
     public static final double kPModuleDriveController = 0.7;
   }
 
   public static final class LadderConstants {
-    public static final int ladderMotorPort1 = DriveConstants.enableLadder == true ? 10 : 0;
-    public static final int ladderMotorPort2 = DriveConstants.enableLadder == true ? 11 : 0;
+    public static final int ladderMotorPort1 = 21; 
+    public static final int ladderMotorPort2 = 22;
     public static final double ladderMotorSpeed = 1.00;
-    public static final int topStalkPosition = 26900;
-    public static final int middleStalkPosition = 13040;
-    public static final int bottomStalkPosition = 6500;//4630;
-    public static final int zeroPosition = 1500;
+    public static final double topStalkPosition = 15;
+    public static final double middleStalkPosition = 10;
+    public static final double bottomStalkPosition = 5;
+    public static final double zeroPosition = 0.1;
   }
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int ballHolder = DriveConstants.enableLadder == true ? 11 : 0;
 
-    public static final int liftMotorPort = DriveConstants.enableLift ? 12 : 0;
-    public static final boolean liftMotorReversed = false;
+    public static final int deAlgifierPort = DriveConstants.enableDeAlgifier ? 12 : 0;
    
     public static final int kRightJoystickPort = 1;
     public static final int ladderShooterPort = 12;
     
 
-    public static final int intakeMotorPort = DriveConstants.enableIntake == true ? 14 : 0;
+    public static final int intakeMotorPort = DriveConstants.enableIntake ? 11 : 0;
     public static final double intakeSpeed = 0.5;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxAutoSpeedMetersPerSecond = 0.5;
+    public static final double kMaxAutoSpeedMetersPerSecond = 1;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = 2* Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 10;
-    public static final double kPYController = 10;
+    public static final double kPXController = 1;
+    public static final double kPYController = 1;
     public static final double kPThetaController = 1;
 
     // Constraint for the motion profiled robot angle controller

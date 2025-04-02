@@ -9,19 +9,15 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -156,6 +152,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void resetGyro() {
     m_gyro.reset();
+    
   }
 
   /**

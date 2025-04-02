@@ -4,11 +4,9 @@
 
 package frc.robot.commands.Ladder;
 
-import frc.robot.Constants;
 import frc.robot.subsystems.LadderSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 
 /** An example command that uses an example subsystem. */
 public class LadderMoveToPosition extends Command {
@@ -39,6 +37,8 @@ public class LadderMoveToPosition extends Command {
   @Override
   public void execute() {
     m_ladder.moveToHeight(y_val);
+    System.out.println("Set");
+
     //System.out.println(m_ladder.m_ladderMotor1.getSelectedSensorPosition());
   }
 

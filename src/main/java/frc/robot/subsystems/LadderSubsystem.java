@@ -6,75 +6,93 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import frc.robot.Constants;
 import frc.robot.Constants.LadderConstants;
-import frc.robot.Constants.OIConstants;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @Logged
 public class LadderSubsystem extends SubsystemBase {
-  public double m_targetPosition = 0;
+  public double m_targetPosition = 10;
 
-  public final WPI_TalonSRX m_ladderMotor1 = new WPI_TalonSRX(LadderConstants.ladderMotorPort1);
-  private final WPI_TalonSRX m_ladderMotor2 = new WPI_TalonSRX(LadderConstants.ladderMotorPort2);
-  private final double m_encoderTickPerMeter = 1;
-  private final double m_meterPerEncoderTick = 1/m_encoderTickPerMeter;
+  public double kP = 0.007;
+  public double kI = 0.0000;
+  public double kD = 0.00;
+  public double kF = 0.03;
+
+  private final SparkMax m_ladderMotor_1 = new SparkMax(LadderConstants.ladderMotorPort1, MotorType.kBrushless);
+  private final SparkMax m_ladderMotor_2 = new SparkMax(LadderConstants.ladderMotorPort2, MotorType.kBrushless);
+  private SparkClosedLoopController closedLoopController;
+  private SparkMaxConfig motorConfigMotor1 = new SparkMaxConfig();
+  private SparkMaxConfig motorConfigMotor2 = new SparkMaxConfig();
+
 
 //12.75
   public LadderSubsystem(){
-    m_ladderMotor1.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
-    m_ladderMotor1.setSelectedSensorPosition(0);
+    closedLoopController = m_ladderMotor_1.getClosedLoopController();
 
-    m_ladderMotor1.setSensorPhase(true);
-    m_ladderMotor2.setSensorPhase(true);
-
-    m_ladderMotor2.setInverted(true);
-    m_ladderMotor1.setInverted(true);
-    m_ladderMotor1.configPeakOutputForward(1);
-    m_ladderMotor2.configPeakOutputForward(1);
+    motorConfigMotor1.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(kP, kI, kD, kF);
+    motorConfigMotor1.idleMode(IdleMode.kBrake);
+    motorConfigMotor1.inverted(true);
     
-    //m_ladderMotor2.configPeakCurrentDuration(3000);
+    motorConfigMotor2.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(kP, kI, kD, kF);
+    motorConfigMotor2.idleMode(IdleMode.kBrake);
+    motorConfigMotor2.follow(Constants.LadderConstants.ladderMotorPort1);
+    motorConfigMotor2.inverted(true);
 
-    m_ladderMotor1.config_kP(0, 0.05);
-    m_ladderMotor1.config_kI(0, 0);
-    m_ladderMotor1.config_kD(0, 0);
-    m_ladderMotor1.config_kF(0, 0.07);
-    //m_ladderMotor1.setNeutralMode(NeutralMode.Brake);
-    m_ladderMotor1.configAllowableClosedloopError(0, 100);
-    m_ladderMotor2.follow(m_ladderMotor1);
+
+    m_ladderMotor_1.configure(motorConfigMotor1, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    m_ladderMotor_2.configure(motorConfigMotor2, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    SmartDashboard.putNumber("kLadderkP", kP);
+    SmartDashboard.putNumber("kLadderkI", kI);
+    SmartDashboard.putNumber("kLadderkD", kD);
+    SmartDashboard.putNumber("kLadderkF", kF);
+    SmartDashboard.putBoolean("New PIDF", false);
+
+
   }
 
   public void moveToHeight(double position){
     m_targetPosition = position;
   }
   public double getHeight(){
-    return m_ladderMotor1.getSelectedSensorPosition();
+    return m_ladderMotor_1.getEncoder().getPosition();
   }
   public double getTargetHeight(){
     return m_targetPosition;
   }
   @Override
+  
   public void periodic() {
-    m_ladderMotor1.set(ControlMode.Position, m_targetPosition);
-    SmartDashboard.putNumber("Lift Height", m_ladderMotor1.getSelectedSensorPosition());
+    if(SmartDashboard.getBoolean("New PIDF", false)){
+      motorConfigMotor1.closedLoop.pidf(
+        SmartDashboard.getNumber("kLadderkP", kP),
+        SmartDashboard.getNumber("kLadderkI", kI),
+        SmartDashboard.getNumber("kLadderkD", kD),
+        SmartDashboard.getNumber("kLadderkF", kF));
+      m_ladderMotor_1.configure(motorConfigMotor1, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+      System.out.println("Ladder New PIDF");
+      //SmartDashboard.putBoolean("New PIDF", false);
+    }
+    SmartDashboard.putNumber("Lift Height", m_ladderMotor_1.getEncoder().getPosition());
+    SmartDashboard.putNumber("Lift Velocity", m_ladderMotor_1.getEncoder().getVelocity());
+    if(Constants.DriveConstants.enableLadder){
+      closedLoopController.setReference(m_targetPosition, ControlType.kPosition);
+      System.out.println("Moving");
+    }else{
+      m_ladderMotor_1.stopMotor();
+      m_ladderMotor_2.stopMotor();
+    }
   }
 }
