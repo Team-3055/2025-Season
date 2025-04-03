@@ -24,12 +24,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @Logged
 public class LadderSubsystem extends SubsystemBase {
-  public double m_targetPosition = 10;
+  public double m_targetPosition = 0;
+  public boolean disabled = false;
 
-  public double kP = 0.007;
-  public double kI = 0.0000;
-  public double kD = 0.00;
-  public double kF = 0.03;
+  public double kP = 0.05;
+  public double kI = 0.0001;
+  public double kD = 0.0001;
+  public double kF = 0.02;
 
   private final SparkMax m_ladderMotor_1 = new SparkMax(LadderConstants.ladderMotorPort1, MotorType.kBrushless);
   private final SparkMax m_ladderMotor_2 = new SparkMax(LadderConstants.ladderMotorPort2, MotorType.kBrushless);
@@ -37,20 +38,19 @@ public class LadderSubsystem extends SubsystemBase {
   private SparkMaxConfig motorConfigMotor1 = new SparkMaxConfig();
   private SparkMaxConfig motorConfigMotor2 = new SparkMaxConfig();
 
-
 //12.75
   public LadderSubsystem(){
     closedLoopController = m_ladderMotor_1.getClosedLoopController();
-
     motorConfigMotor1.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(kP, kI, kD, kF);
     motorConfigMotor1.idleMode(IdleMode.kBrake);
     motorConfigMotor1.inverted(true);
+    motorConfigMotor1.smartCurrentLimit(60);
     
     motorConfigMotor2.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(kP, kI, kD, kF);
     motorConfigMotor2.idleMode(IdleMode.kBrake);
     motorConfigMotor2.follow(Constants.LadderConstants.ladderMotorPort1);
     motorConfigMotor2.inverted(true);
-
+    motorConfigMotor2.smartCurrentLimit(60);
 
     m_ladderMotor_1.configure(motorConfigMotor1, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     m_ladderMotor_2.configure(motorConfigMotor2, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -75,21 +75,17 @@ public class LadderSubsystem extends SubsystemBase {
   @Override
   
   public void periodic() {
-    if(SmartDashboard.getBoolean("New PIDF", false)){
-      motorConfigMotor1.closedLoop.pidf(
-        SmartDashboard.getNumber("kLadderkP", kP),
-        SmartDashboard.getNumber("kLadderkI", kI),
-        SmartDashboard.getNumber("kLadderkD", kD),
-        SmartDashboard.getNumber("kLadderkF", kF));
-      m_ladderMotor_1.configure(motorConfigMotor1, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-      System.out.println("Ladder New PIDF");
-      //SmartDashboard.putBoolean("New PIDF", false);
-    }
+    SmartDashboard.putNumber("Ladder Motor Output", m_ladderMotor_1.getOutputCurrent());
+
     SmartDashboard.putNumber("Lift Height", m_ladderMotor_1.getEncoder().getPosition());
     SmartDashboard.putNumber("Lift Velocity", m_ladderMotor_1.getEncoder().getVelocity());
-    if(Constants.DriveConstants.enableLadder){
-      closedLoopController.setReference(m_targetPosition, ControlType.kPosition);
-      System.out.println("Moving");
+    if(Constants.DriveConstants.enableLadder & disabled == false){
+        if(m_targetPosition == Constants.LadderConstants.zeroPosition){
+          m_ladderMotor_1.stopMotor();
+          m_ladderMotor_2.stopMotor();
+        }else{
+          closedLoopController.setReference(m_targetPosition, ControlType.kPosition);
+        }
     }else{
       m_ladderMotor_1.stopMotor();
       m_ladderMotor_2.stopMotor();

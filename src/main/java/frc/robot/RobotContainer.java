@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
@@ -33,6 +34,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -88,30 +91,29 @@ public boolean driverDriveControlEnabled = true;
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {  
-    new POVButton(m_driverController,90).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition)); //Bottom Right > Bottom Stick
-    new POVButton(m_driverController,180).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition)); //Top Right > Intake*/
-    new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition)); //Top Right > Intake*/
-   
-    new POVButton(m_driverController, 90).whileTrue(new IntakeOut(m_intake));//new LadderMoveToPosition(m_ladder, ladderTargetHeight));
+    new POVButton(m_driverController,0).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition)); //Bottom Right > Bottom Stick
+    new POVButton(m_driverController,90).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition)); //Top Right > Intake*/
+    new POVButton(m_driverController,180).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition)); //Top Right > Intake*/
+    new POVButton(m_driverController,270).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.topStalkPosition)); //Top Right > Intake*/
 
     //new JoystickButton(m_driverController, 1).whileTrue(null);//A Button on Xbox    
     new JoystickButton(m_driverController, 1).whileTrue(new IntakeIn(m_intake)); //X Button on Xbox    
     new JoystickButton(m_driverController, 2).whileTrue(new AlgaeIn(m_dealgae)); //B Button on Xbox    
-    new JoystickButton(m_driverController, 3).whileTrue(new AlgaeOut(m_dealgae)); //Yt Button on Xbox    
+    new JoystickButton(m_driverController, 3).whileTrue(new AlgaeOut(m_dealgae)); //Y Button on Xbox    
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_robotDrive.resetGyro(), m_robotDrive));
 
     //Left L1
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(new ReefMoveToPosition(1, 1, m_ladder, m_robotDrive, m_intake));
+    new JoystickButton(m_driverRJoystick, 11).whileTrue(new ReefMoveToPosition(1, 1, m_ladder, m_robotDrive, m_intake));
     //Left L2
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(new ReefMoveToPosition(1, 2, m_ladder, m_robotDrive, m_intake));
+    new JoystickButton(m_driverRJoystick, 9).whileTrue(new ReefMoveToPosition(1, 2, m_ladder, m_robotDrive, m_intake));
     //Left L3
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(new ReefMoveToPosition(1, 3, m_ladder, m_robotDrive, m_intake));
+    new JoystickButton(m_driverRJoystick, 7).whileTrue(new ReefMoveToPosition(1, 3, m_ladder, m_robotDrive, m_intake));
     //Right L1
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(new ReefMoveToPosition(2, 1, m_ladder, m_robotDrive, m_intake));
+    new JoystickButton(m_driverRJoystick, 12).whileTrue(new ReefMoveToPosition(2, 1, m_ladder, m_robotDrive, m_intake));
     //Right L2
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(new ReefMoveToPosition(2, 2, m_ladder, m_robotDrive, m_intake));
+    new JoystickButton(m_driverRJoystick, 10).whileTrue(new ReefMoveToPosition(2, 2, m_ladder, m_robotDrive, m_intake));
     //Right L3
-    new JoystickButton(m_driverRJoystick, 0).whileTrue(new ReefMoveToPosition(2, 3, m_ladder, m_robotDrive, m_intake));
+    new JoystickButton(m_driverRJoystick, 8).whileTrue(new ReefMoveToPosition(2, 3, m_ladder, m_robotDrive, m_intake));
     
     /*new JoystickButton(m_driverController, 1).onTrue(
      PathMaker.createPathLocal(m_robotDrive, new Transform2d(),List.of()) 
@@ -127,10 +129,12 @@ public boolean driverDriveControlEnabled = true;
   }
 
   public void initDashboard(){
+    SmartDashboard.putNumber("Auto Selector", 0);
     SmartDashboard.putData("Lift L1",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition));
     SmartDashboard.putData("Lift L2",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition));
     SmartDashboard.putData("Lift L3",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition));
-    SmartDashboard.putData("Lift L4",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.topStalkPosition));
+    //SmartDashboard.putData("Lift L4",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.topStalkPosition));
+    SmartDashboard.putData("DisableLift", new InstantCommand((() -> m_ladder.disabled = true), m_ladder));
 
     SmartDashboard.putData("Intake In", new IntakeIn(m_intake));
     SmartDashboard.putData("Intake Out", new IntakeOut(m_intake));
@@ -144,9 +148,11 @@ public boolean driverDriveControlEnabled = true;
   }
   public void updateDashboard(){
     SmartDashboard.putData("PDP Data", m_PDP);
+
     SmartDashboard.putNumber("Lift Height", m_ladder.getHeight());
     SmartDashboard.putNumber("Lift Target Height", m_ladder.m_targetPosition);
     SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
+    
     SmartDashboard.putData("Drive Subsystem", m_robotDrive);
     SmartDashboard.putData("Ladder Subsystem", m_ladder);
     SmartDashboard.putData("Intake Subsystem", m_intake);
@@ -163,7 +169,24 @@ public boolean driverDriveControlEnabled = true;
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand(int autoNumber) {
-    return new LadderMoveToPosition(m_ladder, 10);
+
+  //new MoveToPosition(m_robotDrive, new Pose2d(-1,0,new Rotation2d()), List.of(), false);
+    switch (autoNumber) {
+      case 0:
+        return new Command(){};
+      
+      case 1:
+        return new InstantCommand(()->m_robotDrive.resetGyro(), m_robotDrive).andThen(new MoveToPosition(m_robotDrive, new Pose2d(-1,0,new Rotation2d()), List.of(), false));
+        
+      case 2:
+        return new Command() {};
+      
+      default:
+        return new Command(){};
+      
+
+    }
+  }
     //return (new MoveToPosition(m_robotDrive, new Pose2d(0,1,new Rotation2d()), List.of(), false).andThen(new IntakeIn(m_intake).withTimeout(2)))
     //  .andThen(new MoveToPosition(m_robotDrive, new Pose2d(1,0,new Rotation2d()), List.of(), false));
 
@@ -182,7 +205,7 @@ public boolean driverDriveControlEnabled = true;
     //new Pose2d(0,0.5, new Rotation2d(0)),
     //List.of(),
     //false));
-  }  
+  
   //  ParallelRaceGroup cmd = new RunCommand(()->m_robotDrive.drive(2,0,0,false)).withTimeout(3);
   // return cmd;
     
@@ -195,6 +218,11 @@ public boolean driverDriveControlEnabled = true;
       */
   
   public Command getTestCommand(int testNumber){
+    return new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition);
+    //return new MoveToPosition(m_robotDrive, new Pose2d(5,5,new Rotation2d()), List.of(new Translation2d(5,0)), false)
+    //.andThen(new MoveToPosition(m_robotDrive, new Pose2d(0,0,new Rotation2d()), List.of(), true));
+
+    /*
     switch(testNumber){
       case 1: 
         return new MoveToPosition(
@@ -206,12 +234,13 @@ public boolean driverDriveControlEnabled = true;
       case 2:
         return new ReefMoveToPosition(1, 1, m_ladder, m_robotDrive, m_intake);//reefPathMaker.createCommand(1, 1, m_ladder, m_robotDrive, m_intake);
       case 3:
-        return new LadderMoveToPosition(m_ladder, 10);
+        return new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition);
       default:
         return new Command() {
           
         };
         
     }
+        */
   }
 }

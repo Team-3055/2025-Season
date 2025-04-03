@@ -29,8 +29,8 @@ public class ReefMoveToPosition extends Command {
   private int m_stalk = 0;
   private int m_level = 0;
   private Command finalCommands;
-  private final Transform2d tagTorobotLeftStalkPosiion = new Transform2d(1,-0.127, new Rotation2d(0));
-  private final Transform2d tagTorobotRightStalkPosiion = new Transform2d(-0.127,-0.127, new Rotation2d(0));
+  private final Transform2d tagTorobotLeftStalkPosiion = new Transform2d(-0.127,-0.127, new Rotation2d(0));
+  private final Transform2d tagTorobotRightStalkPosiion = new Transform2d(-0.127,-0.4064, new Rotation2d(0));
 
   /**
    * Creates a new ExampleCommand.
@@ -56,28 +56,23 @@ public class ReefMoveToPosition extends Command {
   @Override
   public void initialize() {
     CommandScheduler.getInstance().cancel(finalCommands);
-    if(m_drive.m_vision.cameraConnected){
-            var robotToTag = m_drive.m_vision.getReefTransform();
+    //if(m_drive.m_vision.cameraConnected){
+            var robotToTag = new Transform2d(1,1,new Rotation2d());//m_drive.m_vision.getReefTransform();
             if(robotToTag != null){
                 //Left Stalk
                 //L2
                 if(m_stalk == 1 && m_level == 1){
                     var robotToPosition = robotToTag.plus(tagTorobotLeftStalkPosiion);
                     finalCommands = new MoveToPosition(m_drive, new Pose2d().plus(robotToPosition), List.of(), false)
-                    .withTimeout(5)
                     .alongWith(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition))
                     .andThen(new IntakeOut(m_intake).withTimeout(3));
-                    System.out.println(robotToPosition);
                 }
                 //L3
                 else if(m_stalk == 1 && m_level == 2){
                     var robotToPosition = robotToTag.plus(tagTorobotLeftStalkPosiion);
                     finalCommands = new MoveToPosition(m_drive, new Pose2d().plus(robotToPosition), List.of(), false)
-                    .withTimeout(5)
                     .alongWith(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition))
                     .andThen(new IntakeOut(m_intake).withTimeout(3));
-                    System.out.println(robotToPosition);
-
                 }
                 //L4
                 else if(m_stalk == 1 && m_level == 3){
@@ -94,7 +89,6 @@ public class ReefMoveToPosition extends Command {
                     finalCommands = new MoveToPosition(m_drive, new Pose2d().plus(robotToPosition), List.of(), false)
                     .alongWith(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition))
                     .andThen(new IntakeOut(m_intake).withTimeout(3));
-                    System.out.println(robotToPosition);
 
                 } 
                 //L3
@@ -114,7 +108,7 @@ public class ReefMoveToPosition extends Command {
               CommandScheduler.getInstance().schedule(finalCommands);
             }
             SmartDashboard.putString("Status", "No Tag Found");
-        }
+      //  }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

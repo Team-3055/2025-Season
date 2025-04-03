@@ -7,9 +7,10 @@ package frc.robot.commands.Ladder;
 import frc.robot.subsystems.LadderSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /** An example command that uses an example subsystem. */
-public class LadderMoveToPosition extends Command {
+public class LadderMoveToPosition extends InstantCommand {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 
   private final LadderSubsystem m_ladder;

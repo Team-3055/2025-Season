@@ -87,15 +87,15 @@ public class MoveToPosition extends Command {
                 DriveConstants.kDriveKinematics,
 
                 // Position controllers
-                new PIDController(5,1,0),
-                new PIDController(5,1,0),
+                new PIDController(15,15,0.5),
+                new PIDController(15,15,0.5),
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
-        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
-            //new InstantCommand(() -> m_drive.resetOdometry(robotTrajectory.getInitialPose())), 
-            swerveControllerCommand,
-            new InstantCommand(() -> m_drive.drive(0, 0, 0, false))));
+        System.out.println(m_finalPose);
+        CommandScheduler.getInstance().schedule(  
+            swerveControllerCommand
+        );
         
             //new InstantCommand(()->System.out.println("Drive complete")));
   }

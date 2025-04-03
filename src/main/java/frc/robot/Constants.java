@@ -23,10 +23,10 @@ public final class Constants {
   
 
   public static final class DriveConstants {
-    public static boolean enableDrive = false;
+    public static boolean enableDrive = true;
     public static boolean enableLadder = true;
-    public static boolean enableIntake = false;
-    public static boolean enableDeAlgifier = false;
+    public static boolean enableIntake = true;
+    public static boolean enableDeAlgifier = true;
     public static boolean enableVision = true;
   
     public static final int kFrontLeftDriveMotorPort = enableDrive ? 1 : 0;
@@ -80,7 +80,7 @@ public final class Constants {
     public static final double kVoltsPerRotation = 60/523;
     public static final double kVoltPerMeterPerSecond = 0.413;
 
-    public static final double kMaxSpeedMetersPerSecond = 3; 
+    public static final double kMaxSpeedMetersPerSecond = 7; 
   }
 
   public class DashboardSettings {
@@ -113,10 +113,10 @@ public final class Constants {
     public static final int ladderMotorPort1 = 21; 
     public static final int ladderMotorPort2 = 22;
     public static final double ladderMotorSpeed = 1.00;
-    public static final double topStalkPosition = 15;
-    public static final double middleStalkPosition = 10;
-    public static final double bottomStalkPosition = 5;
-    public static final double zeroPosition = 0.1;
+    public static final double topStalkPosition = 26.5;
+    public static final double middleStalkPosition = 14.14;
+    public static final double bottomStalkPosition = 6.07;
+    public static final double zeroPosition = 0;
   }
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
