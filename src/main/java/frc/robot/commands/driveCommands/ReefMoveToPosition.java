@@ -29,8 +29,8 @@ public class ReefMoveToPosition extends Command {
   private int m_stalk = 0;
   private int m_level = 0;
   private Command finalCommands;
-  private final Transform2d tagTorobotLeftStalkPosiion = new Transform2d(-1,-1, new Rotation2d(0));
-  private final Transform2d tagTorobotRightStalkPosiion = new Transform2d(-1,-1, new Rotation2d(0));
+  private final Transform2d tagTorobotLeftStalkPosiion = new Transform2d(1,-0.127, new Rotation2d(0));
+  private final Transform2d tagTorobotRightStalkPosiion = new Transform2d(-0.127,-0.127, new Rotation2d(0));
 
   /**
    * Creates a new ExampleCommand.
