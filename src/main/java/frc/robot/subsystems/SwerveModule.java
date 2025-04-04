@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.epilogue.Logged;
@@ -80,7 +82,9 @@ public class SwerveModule {
     
     turningEncoderReversed = (turningEncoderReversedBool == true) ? -1 : 1;
     driveEncoderReversed = (driveEncoderReversedBool == true) ? -1 : 1;
-
+    
+    m_driveMotor.setNeutralMode(NeutralModeValue.Brake);
+    m_turningMotor.setNeutralMode(NeutralModeValue.Brake);
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);

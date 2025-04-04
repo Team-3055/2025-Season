@@ -77,8 +77,8 @@ public boolean driverDriveControlEnabled = true;
                     // Multiply by max speed to map the joystick unitless inputs to actual units.
                     // This will map the [-1, 1] to [max speed backwards, max speed forwards],
                     // converting them to actual units.
-                    Math.abs(m_driverController.getRawAxis(1)) > 0.05 ? -m_driverController.getRawAxis(1) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    Math.abs(m_driverController.getRawAxis(0)) > 0.05 ? -m_driverController.getRawAxis(0) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
+                    Math.abs(m_driverController.getRawAxis(1)) > 0.05 ? -(m_driverController.getRawAxis(1)) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
+                    Math.abs(m_driverController.getRawAxis(0)) > 0.05 ? -(m_driverController.getRawAxis(0)) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     Math.abs(m_driverController.getRawAxis(4)) > 0.2 ? -m_driverController.getRawAxis(4) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond: 0,                    
                     true),
             m_robotDrive));
@@ -169,23 +169,8 @@ public boolean driverDriveControlEnabled = true;
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand(int autoNumber) {
-
-  //new MoveToPosition(m_robotDrive, new Pose2d(-1,0,new Rotation2d()), List.of(), false);
-    switch (autoNumber) {
-      case 0:
-        return new Command(){};
-      
-      case 1:
-        return new InstantCommand(()->m_robotDrive.resetGyro(), m_robotDrive).andThen(new MoveToPosition(m_robotDrive, new Pose2d(-1,0,new Rotation2d()), List.of(), false));
-        
-      case 2:
-        return new Command() {};
-      
-      default:
-        return new Command(){};
-      
-
-    }
+        return new MoveToPosition(m_robotDrive, new Pose2d(-2,0,new Rotation2d()), List.of(new Translation2d(-0.5,0), new Translation2d(-1,0)), false);
+    
   }
     //return (new MoveToPosition(m_robotDrive, new Pose2d(0,1,new Rotation2d()), List.of(), false).andThen(new IntakeIn(m_intake).withTimeout(2)))
     //  .andThen(new MoveToPosition(m_robotDrive, new Pose2d(1,0,new Rotation2d()), List.of(), false));

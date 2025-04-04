@@ -64,11 +64,8 @@ public class MoveToPosition extends Command {
     Trajectory robotTrajectory =
             TrajectoryGenerator.generateTrajectory(
                 // Start at the origin facing the +X direction
-                m_globalPosBoolean == false ? new Pose2d(0,0,new Rotation2d(0)) : m_drive.getPose(),
-                //Pass in points the robot should go through          
-                m_transitionPoses,
+                List.of(m_globalPosBoolean == false ? new Pose2d(0,0,new Rotation2d(0)) : m_drive.getPose(), m_finalPose),
                 //final pose of the robot
-                m_finalPose,
                 m_config);
 
         ProfiledPIDController thetaController =
@@ -87,14 +84,14 @@ public class MoveToPosition extends Command {
                 DriveConstants.kDriveKinematics,
 
                 // Position controllers
-                new PIDController(15,15,0.5),
-                new PIDController(15,15,0.5),
+                new PIDController(5,5,0.5),
+                new PIDController(5,5,0.5),
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
-        System.out.println(m_finalPose);
-        CommandScheduler.getInstance().schedule(  
-            swerveControllerCommand
+        CommandScheduler.getInstance().schedule(
+          new InstantCommand(() -> m_drive.resetOdometry(robotTrajectory.getInitialPose())), 
+          swerveControllerCommand
         );
         
             //new InstantCommand(()->System.out.println("Drive complete")));
