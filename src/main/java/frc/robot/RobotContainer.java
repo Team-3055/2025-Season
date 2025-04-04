@@ -79,7 +79,7 @@ public boolean driverDriveControlEnabled = true;
                     // converting them to actual units.
                     Math.abs(m_driverController.getRawAxis(1)) > 0.05 ? -(m_driverController.getRawAxis(1)) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     Math.abs(m_driverController.getRawAxis(0)) > 0.05 ? -(m_driverController.getRawAxis(0)) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    Math.abs(m_driverController.getRawAxis(4)) > 0.2 ? -m_driverController.getRawAxis(4) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond: 0,                    
+                    Math.abs(m_driverController.getRawAxis(4)) > 0.3 ? -m_driverController.getRawAxis(4) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond: 0,                    
                     true),
             m_robotDrive));
 
@@ -169,7 +169,7 @@ public boolean driverDriveControlEnabled = true;
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand(int autoNumber) {
-        return new MoveToPosition(m_robotDrive, new Pose2d(-2,0,new Rotation2d()), List.of(new Translation2d(-0.5,0), new Translation2d(-1,0)), false);
+        return (new MoveToPosition(m_robotDrive, new Pose2d(3,0,new Rotation2d(0)), List.of(), false).withTimeout(3)).andThen(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition).withTimeout(3)).andThen(new IntakeOut(m_intake).withTimeout(3).andThen(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition)));
     
   }
     //return (new MoveToPosition(m_robotDrive, new Pose2d(0,1,new Rotation2d()), List.of(), false).andThen(new IntakeIn(m_intake).withTimeout(2)))

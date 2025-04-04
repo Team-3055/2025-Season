@@ -5,6 +5,8 @@
 
 package frc.robot;
 
+import org.opencv.features2d.FlannBasedMatcher;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;

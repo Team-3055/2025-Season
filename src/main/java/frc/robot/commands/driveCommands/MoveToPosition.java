@@ -64,8 +64,9 @@ public class MoveToPosition extends Command {
     Trajectory robotTrajectory =
             TrajectoryGenerator.generateTrajectory(
                 // Start at the origin facing the +X direction
-                List.of(m_globalPosBoolean == false ? new Pose2d(0,0,new Rotation2d(0)) : m_drive.getPose(), m_finalPose),
-                //final pose of the robot
+                new Pose2d(0,0, new Rotation2d(0)),
+                List.of(),
+                m_finalPose,                //final pose of the robot
                 m_config);
 
         ProfiledPIDController thetaController =

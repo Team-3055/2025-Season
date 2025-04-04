@@ -38,11 +38,11 @@ public class SwerveModule {
   private final ProfiledPIDController m_drivePIDController =
       new ProfiledPIDController(
         ModuleConstants.kPModuleDriveController,
-        0.0020,
+        0,//.0020,
         0.001,
         new TrapezoidProfile.Constraints(
           DriveConstants.kMaxSpeedMetersPerSecond,
-          500));
+          550));
 
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
 
@@ -83,8 +83,8 @@ public class SwerveModule {
     turningEncoderReversed = (turningEncoderReversedBool == true) ? -1 : 1;
     driveEncoderReversed = (driveEncoderReversedBool == true) ? -1 : 1;
     
-    m_driveMotor.setNeutralMode(NeutralModeValue.Brake);
-    m_turningMotor.setNeutralMode(NeutralModeValue.Brake);
+    //m_driveMotor.setNeutralMode(NeutralModeValue.Brake);
+    //m_turningMotor.setNeutralMode(NeutralModeValue.Brake);
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
