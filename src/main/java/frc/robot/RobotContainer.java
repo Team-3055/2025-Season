@@ -79,7 +79,7 @@ public boolean driverDriveControlEnabled = true;
                     // converting them to actual units.
                     Math.abs(m_driverController.getRawAxis(1)) > 0.05 ? -(m_driverController.getRawAxis(1)) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
                     Math.abs(m_driverController.getRawAxis(0)) > 0.05 ? -(m_driverController.getRawAxis(0)) * DriveConstants.kMaxSpeedMetersPerSecond : 0,
-                    Math.abs(m_driverController.getRawAxis(4)) > 0.3 ? -m_driverController.getRawAxis(4) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond: 0,                    
+                    Math.abs(m_driverController.getRawAxis(2)) > 0.3 ? -m_driverController.getRawAxis(2) * ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond: 0,                    
                     true),
             m_robotDrive));
 
@@ -97,8 +97,8 @@ public boolean driverDriveControlEnabled = true;
     new POVButton(m_driverController,270).whileTrue(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.topStalkPosition)); //Top Right > Intake*/
 
     //new JoystickButton(m_driverController, 1).whileTrue(null);//A Button on Xbox    
-    new JoystickButton(m_driverController, 1).whileTrue(new IntakeIn(m_intake)); //X Button on Xbox    
-    new JoystickButton(m_driverController, 2).whileTrue(new AlgaeIn(m_dealgae)); //B Button on Xbox    
+    new JoystickButton(m_driverController, 6).whileTrue(new IntakeIn(m_intake)); //X Button on Xbox    
+    new JoystickButton(m_driverController, 5).whileTrue(new AlgaeIn(m_dealgae)); //B Button on Xbox    
     new JoystickButton(m_driverController, 3).whileTrue(new AlgaeOut(m_dealgae)); //Y Button on Xbox    
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_robotDrive.resetGyro(), m_robotDrive));
 
@@ -169,7 +169,8 @@ public boolean driverDriveControlEnabled = true;
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand(int autoNumber) {
-        return (new MoveToPosition(m_robotDrive, new Pose2d(3,0,new Rotation2d(0)), List.of(), false).withTimeout(3)).andThen(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition).withTimeout(3)).andThen(new IntakeOut(m_intake).withTimeout(3).andThen(new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition)));
+    return new RunCommand(()->m_robotDrive.drive(-1,0,0, true), m_robotDrive).withTimeout(3);
+    //return new MoveToPosition(m_robotDrive, new Pose2d(1,0,new Rotation2d(0)), List.of(), false).andThen(new IntakeOut(m_intake));
     
   }
     //return (new MoveToPosition(m_robotDrive, new Pose2d(0,1,new Rotation2d()), List.of(), false).andThen(new IntakeIn(m_intake).withTimeout(2)))

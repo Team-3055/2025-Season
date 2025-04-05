@@ -38,7 +38,6 @@ public class LadderMoveToPosition extends InstantCommand {
   @Override
   public void execute() {
     m_ladder.moveToHeight(y_val);
-    System.out.println("Set");
 
     //System.out.println(m_ladder.m_ladderMotor1.getSelectedSensorPosition());
   }

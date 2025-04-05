@@ -33,6 +33,7 @@ public class MoveToPosition extends Command {
   private List<Translation2d> m_transitionPoses;
   private boolean m_globalPosBoolean;
   private DriveSubsystem m_drive = null;
+  private Command m_finalCommands;
   private final TrajectoryConfig m_config =
     new TrajectoryConfig(
       AutoConstants.kMaxAutoSpeedMetersPerSecond,
@@ -61,6 +62,7 @@ public class MoveToPosition extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
     Trajectory robotTrajectory =
             TrajectoryGenerator.generateTrajectory(
                 // Start at the origin facing the +X direction
@@ -90,12 +92,12 @@ public class MoveToPosition extends Command {
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
-        CommandScheduler.getInstance().schedule(
-          new InstantCommand(() -> m_drive.resetOdometry(robotTrajectory.getInitialPose())), 
-          swerveControllerCommand
-        );
-        
-            //new InstantCommand(()->System.out.println("Drive complete")));
+        CommandScheduler.getInstance().isScheduled(m_finalCommands);
+        m_finalCommands = Commands.sequence(
+            //new InstantCommand(() -> m_drive.resetOdometry(robotTrajectory.getInitialPose())), 
+            swerveControllerCommand,
+            new InstantCommand(() -> m_drive.drive(0, 0, 0, false)));
+        CommandScheduler.getInstance().schedule(m_finalCommands);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -106,12 +108,12 @@ public class MoveToPosition extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //CommandScheduler.getInstance().cancel(m_commandSequence);
+    CommandScheduler.getInstance().cancel(m_finalCommands);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return CommandScheduler.getInstance().isScheduled(m_finalCommands);
   }
 }

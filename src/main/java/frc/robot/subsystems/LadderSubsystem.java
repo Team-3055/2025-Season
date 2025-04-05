@@ -27,9 +27,9 @@ public class LadderSubsystem extends SubsystemBase {
   public double m_targetPosition = 0;
   public boolean disabled = false;
 
-  public double kP = 0.05;
-  public double kI = 0.0001;
-  public double kD = 0.0001;
+  public double kP = 0.75;
+  public double kI = 0.0005;
+  public double kD = 0.0005;
   public double kF = 0.02;
 
   private final SparkMax m_ladderMotor_1 = new SparkMax(LadderConstants.ladderMotorPort1, MotorType.kBrushless);

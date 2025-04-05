@@ -42,7 +42,7 @@ public class SwerveModule {
         0.001,
         new TrapezoidProfile.Constraints(
           DriveConstants.kMaxSpeedMetersPerSecond,
-          550));
+          1000));
 
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
 
