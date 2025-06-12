@@ -18,12 +18,14 @@ import frc.robot.subsystems.LadderSubsystem;
 import frc.robot.commands.Ladder.LadderMoveToPosition;
 import frc.robot.commands.driveCommands.MoveToPosition;
 import frc.robot.commands.driveCommands.ReefMoveToPosition;
+import frc.robot.commands.PathMaker;
 import frc.robot.commands.Dealgaefier.AlgaeIn;
 import frc.robot.commands.Dealgaefier.AlgaeOut;
 import frc.robot.commands.Intake.IntakeIn;
 import frc.robot.commands.Intake.IntakeOut;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -51,6 +53,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake(); 
   private final Dealgaefier m_dealgae = new Dealgaefier();
   private final PowerDistribution m_PDP = new PowerDistribution();
+  private final PathMaker m_PathMaker = new PathMaker();
 
   public double ladderTargetHeight = 0;
   public ShuffleboardTab tab;
@@ -101,6 +104,7 @@ public boolean driverDriveControlEnabled = true;
     new JoystickButton(m_driverController, 5).whileTrue(new AlgaeIn(m_dealgae)); //B Button on Xbox    
     new JoystickButton(m_driverController, 3).whileTrue(new AlgaeOut(m_dealgae)); //Y Button on Xbox    
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_robotDrive.resetGyro(), m_robotDrive));
+    new JoystickButton(m_driverController, 1).onTrue(new InstantCommand(() -> m_ladder.resetEncoders(), m_ladder));
 
     //Left L1
     new JoystickButton(m_driverRJoystick, 11).whileTrue(new ReefMoveToPosition(1, 1, m_ladder, m_robotDrive, m_intake));
@@ -133,7 +137,7 @@ public boolean driverDriveControlEnabled = true;
     SmartDashboard.putData("Lift L1",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.zeroPosition));
     SmartDashboard.putData("Lift L2",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition));
     SmartDashboard.putData("Lift L3",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.middleStalkPosition));
-    //SmartDashboard.putData("Lift L4",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.topStalkPosition));
+    SmartDashboard.putData("Lift L4",  new LadderMoveToPosition(m_ladder, Constants.LadderConstants.topStalkPosition));
     SmartDashboard.putData("DisableLift", new InstantCommand((() -> m_ladder.disabled = true), m_ladder));
 
     SmartDashboard.putData("Intake In", new IntakeIn(m_intake));
@@ -170,7 +174,9 @@ public boolean driverDriveControlEnabled = true;
    */
   public Command getAutonomousCommand(int autoNumber) {
     return new RunCommand(()->m_robotDrive.drive(-1,0,0, true), m_robotDrive).withTimeout(3);
-    //return new MoveToPosition(m_robotDrive, new Pose2d(1,0,new Rotation2d(0)), List.of(), false).andThen(new IntakeOut(m_intake));
+   // return m_PathMaker.createPath(m_robotDrive, new Pose2d(1,0,new Rotation2d()), List.of(), null)
+    //.andThen(new ReefMoveToPosition(2, 1, m_ladder, m_robotDrive, m_intake))
+    //.andThen(new IntakeOut(m_intake));
     
   }
     //return (new MoveToPosition(m_robotDrive, new Pose2d(0,1,new Rotation2d()), List.of(), false).andThen(new IntakeIn(m_intake).withTimeout(2)))
@@ -192,7 +198,7 @@ public boolean driverDriveControlEnabled = true;
     //List.of(),
     //false));
   
-  //  ParallelRaceGroup cmd = new RunCommand(()->m_robotDrive.drive(2,0,0,false)).withTimeout(3);
+  //ParallelRaceGroup cmd = new RunCommand(()->m_robotDrive.drive(2,0,0,false)).withTimeout(3);
   // return cmd;
     
       
@@ -204,7 +210,7 @@ public boolean driverDriveControlEnabled = true;
       */
   
   public Command getTestCommand(int testNumber){
-    return new LadderMoveToPosition(m_ladder, Constants.LadderConstants.bottomStalkPosition);
+    return new ReefMoveToPosition(1,1,m_ladder,m_robotDrive,m_intake);
     //return new MoveToPosition(m_robotDrive, new Pose2d(5,5,new Rotation2d()), List.of(new Translation2d(5,0)), false)
     //.andThen(new MoveToPosition(m_robotDrive, new Pose2d(0,0,new Rotation2d()), List.of(), true));
 

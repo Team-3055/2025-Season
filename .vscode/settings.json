@@ -61,5 +61,6 @@
     "minimap.background": "#00000000",
     "scrollbar.shadow": "#00000000"
   },
-  "wpilib.autoSaveOnDeploy": true
+  "wpilib.autoSaveOnDeploy": true,
+  "wpilib.autoStartRioLog": true
 }

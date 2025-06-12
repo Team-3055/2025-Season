@@ -27,7 +27,7 @@ public class LadderSubsystem extends SubsystemBase {
   public double m_targetPosition = 0;
   public boolean disabled = false;
 
-  public double kP = 0.75;
+  public double kP = 0.25;
   public double kI = 0.0005;
   public double kD = 0.0005;
   public double kF = 0.02;
@@ -41,7 +41,7 @@ public class LadderSubsystem extends SubsystemBase {
 //12.75
   public LadderSubsystem(){
     closedLoopController = m_ladderMotor_1.getClosedLoopController();
-    motorConfigMotor1.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(kP, kI, kD, kF);
+    motorConfigMotor1.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder). pidf(kP, kI, kD, kF);
     motorConfigMotor1.idleMode(IdleMode.kBrake);
     motorConfigMotor1.inverted(true);
     motorConfigMotor1.smartCurrentLimit(60);
@@ -72,8 +72,12 @@ public class LadderSubsystem extends SubsystemBase {
   public double getTargetHeight(){
     return m_targetPosition;
   }
+  public void resetEncoders(){
+    m_ladderMotor_1.getEncoder().setPosition(0);
+    m_ladderMotor_2.getEncoder().setPosition(0);
+  }
+
   @Override
-  
   public void periodic() {
     SmartDashboard.putNumber("Ladder Motor Output", m_ladderMotor_1.getOutputCurrent());
 

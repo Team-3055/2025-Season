@@ -33,8 +33,8 @@ public class MoveToPosition extends Command {
   private List<Translation2d> m_transitionPoses;
   private boolean m_globalPosBoolean;
   private DriveSubsystem m_drive = null;
-  private Command m_finalCommands;
-  private final TrajectoryConfig m_config =
+  SwerveControllerCommand swerveControllerCommand;
+    private final TrajectoryConfig m_config =
     new TrajectoryConfig(
       AutoConstants.kMaxAutoSpeedMetersPerSecond,
     AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -63,7 +63,7 @@ public class MoveToPosition extends Command {
   @Override
   public void initialize() {
     
-    Trajectory robotTrajectory =
+    Trajectory robotTrajectory = 
             TrajectoryGenerator.generateTrajectory(
                 // Start at the origin facing the +X direction
                 new Pose2d(0,0, new Rotation2d(0)),
@@ -80,7 +80,7 @@ public class MoveToPosition extends Command {
             m_drive.setRelativePose(m_drive.getPose());
         }
 
-        SwerveControllerCommand swerveControllerCommand =
+        swerveControllerCommand =
             new SwerveControllerCommand(
                 robotTrajectory,
                 m_globalPosBoolean == true ? m_drive::getPose : m_drive::getRelativePose, // Functional interface to feed supplier
@@ -92,28 +92,25 @@ public class MoveToPosition extends Command {
                 thetaController,
                 m_drive::setModuleStates,
                 m_drive);
-        CommandScheduler.getInstance().isScheduled(m_finalCommands);
-        m_finalCommands = Commands.sequence(
-            //new InstantCommand(() -> m_drive.resetOdometry(robotTrajectory.getInitialPose())), 
-            swerveControllerCommand,
-            new InstantCommand(() -> m_drive.drive(0, 0, 0, false)));
-        CommandScheduler.getInstance().schedule(m_finalCommands);
+        swerveControllerCommand.schedule();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    System.out.println(swerveControllerCommand.isFinished());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    CommandScheduler.getInstance().cancel(m_finalCommands);
+    swerveControllerCommand.end(true);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return CommandScheduler.getInstance().isScheduled(m_finalCommands);
+    System.out.println(swerveControllerCommand.isFinished());
+    return swerveControllerCommand.isFinished();
   }
 }
