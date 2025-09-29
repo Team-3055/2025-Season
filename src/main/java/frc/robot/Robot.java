@@ -4,8 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.TimedRobot;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -15,7 +16,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+@Logged
+public class Robot extends TimedRobot {  
   private Command m_autonomousCommand;
   private Command m_testCommand;
 
@@ -27,7 +29,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -48,6 +49,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    m_robotContainer.periodic();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -60,7 +62,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand((int) SmartDashboard.getNumber("Auto Selector",0));//(int) SmartDashboard.getNumber("Auto Select", 1));
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -98,7 +100,7 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    m_testCommand = m_robotContainer.getTestCommand(1);
+    m_testCommand = m_robotContainer.getTestCommand(3);
     if (m_testCommand != null) {
       m_testCommand.schedule();
     }

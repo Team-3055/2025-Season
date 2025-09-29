@@ -4,123 +4,117 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
-import frc.robot.Robot;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@Logged
 public class DriveSubsystem extends SubsystemBase {
   // Robot swerve modules
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
   NetworkTable table = inst.getTable("datatable");
   SwerveModuleState[] swerveModuleStates;
   
-  StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault()
+  StructArrayPublisher<SwerveModuleState> modulePublisher = NetworkTableInstance.getDefault()
     .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+  StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
     .getStructTopic("MyPose", Pose2d.struct).publish();
 
-  DoublePublisher anglePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Angles").publish();
-  DoublePublisher speedPublisher = NetworkTableInstance.getDefault().getDoubleTopic("Speed").publish();
-  DoublePublisher distancePublisher = NetworkTableInstance.getDefault().getDoubleTopic("Distance").publish();
-
-
-
-
-  private final SwerveModule m_frontLeft =
+  public final SwerveModule m_frontLeft =
       new SwerveModule(
           DriveConstants.kFrontLeftDriveMotorPort,
           DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
           DriveConstants.kFrontLeftTurningEncoderPorts,
           DriveConstants.kFrontLeftDriveEncoderReversed,
           DriveConstants.kFrontLeftTurningEncoderReversed);
 
-  private final SwerveModule m_rearLeft =
+  public final SwerveModule m_rearLeft =
       new SwerveModule(
           DriveConstants.kRearLeftDriveMotorPort,
           DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
           DriveConstants.kRearLeftTurningEncoderPorts,
           DriveConstants.kRearLeftDriveEncoderReversed,
           DriveConstants.kRearLeftTurningEncoderReversed);
 
-  private final SwerveModule m_frontRight =
+  public final SwerveModule m_frontRight =
       new SwerveModule(
           DriveConstants.kFrontRightDriveMotorPort,
           DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
           DriveConstants.kFrontRightTurningEncoderPorts,
           DriveConstants.kFrontRightDriveEncoderReversed,
           DriveConstants.kFrontRightTurningEncoderReversed);
 
-  private final SwerveModule m_rearRight =
+  public final SwerveModule m_rearRight =
       new SwerveModule(
           DriveConstants.kRearRightDriveMotorPort,
           DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
           DriveConstants.kRearRightTurningEncoderPorts,
           DriveConstants.kRearRightDriveEncoderReversed,
           DriveConstants.kRearRightTurningEncoderReversed);
 
+  public final VisionSubsystem m_vision = Constants.DriveConstants.enableVision ? new VisionSubsystem() : null;
+
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
-  private final ADXRS450_GyroSim m_GyroSim = new ADXRS450_GyroSim(m_gyro);
   
+  private Pose2d relativePose = new Pose2d();
+
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
-          DriveConstants.kDriveKinematics,
-          m_gyro.getRotation2d(),
-          new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-          });
+  SwerveDrivePoseEstimator m_odometry = 
+    new SwerveDrivePoseEstimator(
+      DriveConstants.kDriveKinematics,
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      },
+      new Pose2d());
 
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  public DriveSubsystem() {
+    m_gyro.calibrate();
+  }
 
   
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
-    
-    //If robot is in simulation update published data every periodic call
-    if(Robot.isSimulation()){
-      anglePublisher.set(m_frontLeft.getTurnAngle());
-      speedPublisher.set(m_frontLeft.getSpeed());
-      distancePublisher.set(m_frontLeft.getModuleDistance());
-    
-      publisher.set(swerveModuleStates);
-
-      //update the simulated sensors to data that was sent to the motors.
-      m_odometry.update(
-        m_gyro.getRotation2d(),
-        new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-        });
-      //send the robot pose via network tables so sim-data can be viewed
-      posePublisher.set(m_odometry.getPoseMeters());
+    if(m_vision != null){
+      m_vision.updateCamera();
     }
+    //add vision position estimates to odometry calculations.
+    /*if(Constants.DriveConstants.enableVision){
+      var visionPoseEstimate = m_vision.getEstimatedGlobalPose();
+      if(visionPoseEstimate != null){
+        m_odometry.addVisionMeasurement(visionPoseEstimate.estimatedPose.toPose2d(), visionPoseEstimate.timestampSeconds);
+      }
+    }*/
+
+    //update odometry with swerve module positions
+    m_odometry.update(       
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      });
+    posePublisher.set(m_odometry.getEstimatedPosition());
   }
 
   /**
@@ -129,7 +123,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();//.getEstimatedPosition();
+  }
+  public Pose2d getRelativePose(){
+    return m_odometry.getEstimatedPosition().relativeTo(relativePose);
+  }
+
+  public void setRelativePose(Pose2d pose){
+    relativePose = pose;
   }
 
   /**
@@ -147,6 +148,11 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
         },
         pose);
+  }
+
+  public void resetGyro() {
+    m_gyro.reset();
+    
   }
 
   /**
@@ -169,16 +175,13 @@ public class DriveSubsystem extends SubsystemBase {
     
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    
-    if (Robot.isSimulation()) {
-      m_GyroSim.setAngle((m_gyro.getAngle() - (Math.toDegrees(rot) * 0.02)) * 1);//oduleConstants.kMaxModuleAngularSpeedRadiansPerSecond);
-    }
-
+    modulePublisher.set(swerveModuleStates);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
-
+    
+    //System.out.println(m_rearRight.driveOutput);
   }
 
   /**
@@ -189,7 +192,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    publisher.set(desiredStates);
+    modulePublisher.set(desiredStates);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -226,5 +229,13 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public void changeMaxSpeed(double speed){
+    m_frontLeft.changeMaxSpeed(speed);
+    m_frontRight.changeMaxSpeed(speed);
+    m_rearLeft.changeMaxSpeed(speed);
+    m_rearRight.changeMaxSpeed(speed);
+
   }
 }

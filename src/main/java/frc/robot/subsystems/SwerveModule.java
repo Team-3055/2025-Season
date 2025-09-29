@@ -5,28 +5,47 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.CANcoder;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.DriveConstants;
 
+@Logged
 public class SwerveModule {
-  private final TalonFX m_driveMotor;
-  private final TalonFX m_turningMotor;
+  public final TalonFX m_driveMotor;
+  public final TalonFX m_turningMotor;
   private final CANcoder m_turningEncoderNew;
   
   private final int turningEncoderReversed;
   private final int driveEncoderReversed;
 
-  private final PIDController m_drivePIDController =
-      new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
+  public SwerveModulePosition swervePosition;
+  public double moduleDistance;
+  public CommandJoystick stick = new CommandJoystick(3);
+
+  public int driveChannel;
+
+  private final ProfiledPIDController m_drivePIDController =
+      new ProfiledPIDController(
+        ModuleConstants.kPModuleDriveController,
+        0,//.0020,
+        0.001,
+        new TrapezoidProfile.Constraints(
+          DriveConstants.kMaxSpeedMetersPerSecond,
+          1000));
+
+  private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(0, 3);
+
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController =
@@ -51,16 +70,21 @@ public class SwerveModule {
   public SwerveModule(
       int driveMotorChannel,
       int turningMotorChannel,
-      int turningEncoderChannels,
+        int turningEncoderChannels,
       Boolean driveEncoderReversedBool,
       Boolean turningEncoderReversedBool) {
+
+    driveChannel = driveMotorChannel;
+
     m_driveMotor = new TalonFX(driveMotorChannel);
     m_turningMotor = new TalonFX(turningMotorChannel);
-    m_turningEncoderNew = new CANcoder(0);
+    m_turningEncoderNew = new CANcoder(turningEncoderChannels);
     
     turningEncoderReversed = (turningEncoderReversedBool == true) ? -1 : 1;
     driveEncoderReversed = (driveEncoderReversedBool == true) ? -1 : 1;
-
+    
+    //m_driveMotor.setNeutralMode(NeutralModeValue.Brake);
+    //m_turningMotor.setNeutralMode(NeutralModeValue.Brake);
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
     m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
@@ -70,11 +94,14 @@ public class SwerveModule {
    * Returns the current state of the module.
    *
    * @return The current state of the module.
+   * 
    */
+
   public SwerveModuleState getState() {
+  
     return new SwerveModuleState(
         //m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.getDistance()));
-        (driveEncoderReversed * m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
+        (-driveEncoderReversed * m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValue()));//.getValueAsDouble() * 2 * Math.PI));
   }
 
   /**
@@ -83,19 +110,11 @@ public class SwerveModule {
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(
+    swervePosition = new SwerveModulePosition(
         //m_driveEncoder.getDistance(), new Rotation2d(m_turningEncoder.getDistance()));
-        (m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValueAsDouble()));
+        (driveEncoderReversed * m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation), new Rotation2d(m_turningEncoderNew.getPosition().getValue()));
+    return swervePosition;
   }
-
-
-  //used for updating the simulated encoder of the robot
-  /*public void updateSimEncoders(SwerveModuleState newState){
-
-    m_turningEncoderSim.setDistance(newState.angle.getRadians());
-    m_driveEncoderSim.setRate(newState.speedMetersPerSecond);
-    m_driveEncoderSim.setDistance(m_driveEncoderSim.getDistance() + (newState.speedMetersPerSecond * 0.02));
-  }*/
 
   public double getTurnAngle(){
     //return m_turningEncoder.getDistance();
@@ -106,7 +125,8 @@ public class SwerveModule {
   }
   public double getModuleDistance(){
     //return m_driveEncoder.getDistance();
-    return m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation;
+    moduleDistance = m_driveMotor.getPosition().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation;
+    return moduleDistance;
   }
   /**
    * Sets the desired state for the module.
@@ -115,32 +135,33 @@ public class SwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState) {
     var encoderRotation = new Rotation2d(m_turningEncoderNew.getPosition().getValue());
-    
+    desiredState.speedMetersPerSecond *= driveEncoderReversed;
     // Optimize the reference state to avoid spinning further than 90 degrees
-    SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
+    desiredState.optimize(encoderRotation);
     
     // Scale speed by cosine of angle error. This scales down movement perpendicular to the desired
     // direction of travel that can occur when modules change directions. This results in smoother
     // driving.
-    state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
-
-    //update the simulated encoders and gyros
-    /*if(Robot.isReal()){
-      updateSimEncoders(state);
-    }*/
+    desiredState.cosineScale(encoderRotation);
     
     // Calculate the drive output from the drive PID controller.
-    final double driveOutput =
-        m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, state.speedMetersPerSecond);
-
-    // Calculate the turning motor output from the turning PID controller.
-    final double turnOutput =
-        m_turningPIDController.calculate(m_turningEncoderNew.getPosition().getValueAsDouble(), state.angle.getRadians());
-
-    // Calculate the turning motor output from the turning PID controller.
-    m_driveMotor.set(driveOutput);
-    m_turningMotor.set(turnOutput);
     
+    final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getVelocity().getValueAsDouble() * ModuleConstants.kDriveEncoderDistancePerRotation, desiredState.speedMetersPerSecond);
+    
+    final double driveFeedforward = m_driveFeedforward.calculate(driveOutput);//desiredState.speedMetersPerSecond);
+    // Calculate the turning motor output from the turning PID controller.
+    final double turnOutput = //desiredState.angle.getRotations() - encoderRotation.getRotations();
+      m_turningPIDController.calculate(m_turningEncoderNew.getAbsolutePosition().getValueAsDouble() * 2* Math.PI, desiredState.angle.getRadians());
+    
+    // Calculate the turning motor output from the turning PID controller.
+    m_driveMotor.setVoltage(/*(driveOutput + */driveFeedforward);//desiredState.speedMetersPerSecond);
+    m_turningMotor.setVoltage(turningEncoderReversed * turnOutput);
+    
+  }
+  public void changeMaxSpeed(double Speed){
+    m_drivePIDController.setConstraints(new TrapezoidProfile.Constraints(
+      Speed,
+      2));
   }
 
   /** Zeroes all the SwerveModule encoders. */
@@ -148,4 +169,5 @@ public class SwerveModule {
     m_driveMotor.setPosition(0);
     m_turningEncoderNew.setPosition(0);
   }
+
 }
